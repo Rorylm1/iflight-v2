@@ -75,14 +75,20 @@ export async function POST(request: Request) {
       const apiData = await getFlightFromApi(cleanFlightNumber, date);
 
       if (apiData) {
-        // Use distance directly from API response (works for any airport)
+        // Use all data from API response
         enrichedData = {
           airline: apiData.airline,
           departure_airport: apiData.departure_airport,
+          departure_airport_name: apiData.departure_airport_name,
+          departure_country: apiData.departure_country,
           departure_time: apiData.departure_time,
+          departure_time_actual: apiData.departure_time_actual,
           departure_terminal: apiData.departure_terminal,
           arrival_airport: apiData.arrival_airport,
+          arrival_airport_name: apiData.arrival_airport_name,
+          arrival_country: apiData.arrival_country,
           arrival_time: apiData.arrival_time,
+          arrival_time_actual: apiData.arrival_time_actual,
           arrival_terminal: apiData.arrival_terminal,
           status: apiData.status,
           aircraft: apiData.aircraft,
@@ -112,10 +118,16 @@ export async function POST(request: Request) {
         date: date,
         airline: enrichedData.airline,
         departure_airport: enrichedData.departure_airport,
+        departure_airport_name: enrichedData.departure_airport_name,
+        departure_country: enrichedData.departure_country,
         departure_time: enrichedData.departure_time,
+        departure_time_actual: enrichedData.departure_time_actual,
         departure_terminal: enrichedData.departure_terminal,
         arrival_airport: enrichedData.arrival_airport,
+        arrival_airport_name: enrichedData.arrival_airport_name,
+        arrival_country: enrichedData.arrival_country,
         arrival_time: enrichedData.arrival_time,
+        arrival_time_actual: enrichedData.arrival_time_actual,
         arrival_terminal: enrichedData.arrival_terminal,
         status: enrichedData.status,
         aircraft: enrichedData.aircraft,

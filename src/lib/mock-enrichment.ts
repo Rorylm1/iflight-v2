@@ -110,10 +110,16 @@ function getRandomAirportPair(): [string, string] {
 export interface EnrichedFlightData {
   airline: string;
   departure_airport: string;
+  departure_airport_name: string | null;
+  departure_country: string | null;
   departure_time: string; // ISO timestamp
+  departure_time_actual: string | null;
   departure_terminal: string | null;
   arrival_airport: string;
+  arrival_airport_name: string | null;
+  arrival_country: string | null;
   arrival_time: string; // ISO timestamp
+  arrival_time_actual: string | null;
   arrival_terminal: string | null;
   status: string;
   aircraft: string;
@@ -174,10 +180,18 @@ export async function enrichFlight(
   return {
     airline,
     departure_airport: departureCode,
+    departure_airport_name: departureAirport.name,
+    departure_country: departureAirport.country === 'United States' ? 'US' :
+                       departureAirport.country === 'United Kingdom' ? 'GB' : null,
     departure_time: departureDate.toISOString(),
+    departure_time_actual: null,
     departure_terminal: getTerminal(),
     arrival_airport: arrivalCode,
+    arrival_airport_name: arrivalAirport.name,
+    arrival_country: arrivalAirport.country === 'United States' ? 'US' :
+                     arrivalAirport.country === 'United Kingdom' ? 'GB' : null,
     arrival_time: arrivalDate.toISOString(),
+    arrival_time_actual: null,
     arrival_terminal: getTerminal(),
     status,
     aircraft: randomItem(AIRCRAFT),

@@ -8,10 +8,16 @@ export interface Flight {
   date: string;
   airline: string;
   departure_airport: string;
+  departure_airport_name: string | null;
+  departure_country: string | null;
   departure_time: string;
+  departure_time_actual: string | null;
   departure_terminal: string | null;
   arrival_airport: string;
+  arrival_airport_name: string | null;
+  arrival_country: string | null;
   arrival_time: string;
+  arrival_time_actual: string | null;
   arrival_terminal: string | null;
   status: string;
   aircraft: string | null;
@@ -55,6 +61,16 @@ function formatDate(dateString: string): string {
 function formatDistance(km: number | null): string {
   if (km === null || km === undefined) return "—";
   return km.toLocaleString() + " km";
+}
+
+// Convert country code to flag emoji (GB -> 🇬🇧)
+function countryToFlag(countryCode: string | null): string {
+  if (!countryCode) return "";
+  const codePoints = countryCode
+    .toUpperCase()
+    .split("")
+    .map((char) => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
 }
 
 export default function FlightCard({ flight, onDelete }: FlightCardProps) {
@@ -159,6 +175,39 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
       {/* Expanded details */}
       {isExpanded && (
         <div className="border-t border-gray-800 p-5 bg-gray-950/50">
+          {/* Airport details */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                From
+              </div>
+              <div className="text-sm">
+                <span className="mr-2">{countryToFlag(flight.departure_country)}</span>
+                {flight.departure_airport_name || flight.departure_airport}
+              </div>
+              {flight.departure_time_actual && flight.departure_time_actual !== flight.departure_time && (
+                <div className="text-amber text-xs mt-1">
+                  Revised: {formatTime(flight.departure_time_actual)}
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
+                To
+              </div>
+              <div className="text-sm">
+                <span className="mr-2">{countryToFlag(flight.arrival_country)}</span>
+                {flight.arrival_airport_name || flight.arrival_airport}
+              </div>
+              {flight.arrival_time_actual && flight.arrival_time_actual !== flight.arrival_time && (
+                <div className="text-green-400 text-xs mt-1">
+                  Expected: {formatTime(flight.arrival_time_actual)}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Flight details */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
               <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
@@ -180,7 +229,7 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
               <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
                 Aircraft
               </div>
-              <div className="font-mono text-sm">{flight.aircraft}</div>
+              <div className="font-mono text-sm">{flight.aircraft || "—"}</div>
             </div>
             <div>
               <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">

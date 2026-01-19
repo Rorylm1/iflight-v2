@@ -12,10 +12,16 @@ const RAPIDAPI_HOST = "aerodatabox.p.rapidapi.com";
 export interface FlightApiResponse {
   airline: string;
   departure_airport: string;
+  departure_airport_name: string | null;
+  departure_country: string | null;
   departure_time: string;
+  departure_time_actual: string | null;  // Revised time if delayed
   departure_terminal: string | null;
   arrival_airport: string;
+  arrival_airport_name: string | null;
+  arrival_country: string | null;
   arrival_time: string;
+  arrival_time_actual: string | null;    // Predicted time
   arrival_terminal: string | null;
   status: string;
   aircraft: string | null;
@@ -34,8 +40,13 @@ interface AeroDataBoxFlight {
     airport?: {
       iata?: string;
       name?: string;
+      countryCode?: string;
     };
     scheduledTime?: {
+      utc?: string;
+      local?: string;
+    };
+    revisedTime?: {
       utc?: string;
       local?: string;
     };
@@ -45,8 +56,13 @@ interface AeroDataBoxFlight {
     airport?: {
       iata?: string;
       name?: string;
+      countryCode?: string;
     };
     scheduledTime?: {
+      utc?: string;
+      local?: string;
+    };
+    predictedTime?: {
       utc?: string;
       local?: string;
     };
@@ -154,10 +170,16 @@ export async function getFlightFromApi(
     const result: FlightApiResponse = {
       airline: flight.airline?.name || flight.airline?.iata || "Unknown Airline",
       departure_airport: flight.departure?.airport?.iata || "???",
+      departure_airport_name: flight.departure?.airport?.name || null,
+      departure_country: flight.departure?.airport?.countryCode || null,
       departure_time: toIsoTime(flight.departure?.scheduledTime?.utc),
+      departure_time_actual: flight.departure?.revisedTime?.utc ? toIsoTime(flight.departure.revisedTime.utc) : null,
       departure_terminal: flight.departure?.terminal || null,
       arrival_airport: flight.arrival?.airport?.iata || "???",
+      arrival_airport_name: flight.arrival?.airport?.name || null,
+      arrival_country: flight.arrival?.airport?.countryCode || null,
       arrival_time: toIsoTime(flight.arrival?.scheduledTime?.utc),
+      arrival_time_actual: flight.arrival?.predictedTime?.utc ? toIsoTime(flight.arrival.predictedTime.utc) : null,
       arrival_terminal: flight.arrival?.terminal || null,
       status: mapStatus(flight.status),
       aircraft: flight.aircraft?.model || null,
