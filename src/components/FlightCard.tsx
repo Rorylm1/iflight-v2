@@ -96,6 +96,11 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
             </span>
             <span className="text-gray-500">•</span>
             <span className="text-gray-400">{flight.airline}</span>
+            {flight.source.includes("estimated") && (
+              <span className="text-xs px-2 py-0.5 bg-gray-800 border border-gray-700 rounded text-gray-500">
+                estimated
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
@@ -178,9 +183,11 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
             </div>
             <div>
               <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Source
+                Data
               </div>
-              <div className="font-mono text-lg capitalize">{flight.source}</div>
+              <div className="font-mono text-sm">
+                {flight.source.includes("estimated") ? "Estimated" : "Live API"}
+              </div>
             </div>
           </div>
 

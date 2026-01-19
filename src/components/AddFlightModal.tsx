@@ -107,13 +107,13 @@ export default function AddFlightModal({
               placeholder="e.g., BA123"
               className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded text-white font-mono text-lg placeholder-gray-500 focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber caret-amber"
               required
-              pattern="[A-Za-z]{2}[0-9]{1,4}"
-              title="Flight number format: 2 letters followed by 1-4 digits (e.g., BA123)"
+              pattern="[A-Za-z0-9]{2,3}[0-9]{1,4}"
+              title="Flight number format: 2-3 character airline code + 1-4 digits (e.g., BA123, EZY456, U2986)"
               disabled={isLoading}
               autoComplete="off"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Format: 2 letters + 1-4 digits (e.g., BA123, AA1234)
+              e.g., BA123, EZY456, U2986
             </p>
           </div>
 

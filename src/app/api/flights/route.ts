@@ -48,11 +48,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate flight number format (e.g., BA123, AA1234)
-    const flightNumberRegex = /^[A-Z]{2}\d{1,4}$/i;
+    // Validate flight number format (e.g., BA123, EZY456, U2986)
+    // Airline codes can be 2-3 alphanumeric chars, followed by 1-4 digits
+    const flightNumberRegex = /^[A-Z0-9]{2,3}\d{1,4}$/i;
     if (!flightNumberRegex.test(flightNumber.trim())) {
       return NextResponse.json(
-        { error: "Invalid flight number format. Use format like BA123" },
+        { error: "Invalid flight number format. Use format like BA123, EZY456, or U2986" },
         { status: 400 }
       );
     }
@@ -108,6 +109,7 @@ export async function POST(request: Request) {
     }
 
     // Save to Supabase
+    // Source format: "manual:api" or "manual:mock" to track data origin
     const { data: flight, error: insertError } = await supabase
       .from("flights")
       .insert({
@@ -124,7 +126,7 @@ export async function POST(request: Request) {
         status: enrichedData.status,
         aircraft: enrichedData.aircraft,
         distance_km: enrichedData.distance_km,
-        source: "manual",
+        source: dataSource === "api" ? "manual" : "manual:estimated",
       })
       .select()
       .single();
