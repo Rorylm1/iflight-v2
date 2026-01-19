@@ -78,31 +78,38 @@ create policy "Users see own flights" on flights
 
 ## Milestones
 
-**M1: Foundation**
+**M1: Foundation** ✅
 - Next.js + Tailwind + Supabase setup
 - Auth flow (sign up/in/out)
 - Basic layout with retro styling
 - Deploy to Vercel
 
-**M2: Core Flight Loop**
+**M2: Core Flight Loop** ✅
 - Add flight form (flight number + date)
 - Mock enrichment API
 - Save to Supabase, display on dashboard
 - Upcoming/past sections
 
-**M3: Gmail Sync** (personal use only)
+**M3: Real Flight Data**
+- Replace mock enrichment with AeroDataBox API
+- Seed airports table with real IATA codes, coordinates
+- Calculate accurate flight distances
+- Handle API errors gracefully (fallback to partial data)
+- Cache responses to minimize API usage
+
+**M4: Gmail Sync** (personal use only)
 - Google OAuth in test mode (no app verification needed)
 - Fetch booking emails from last 90 days
 - OpenAI parsing → extract flight number + date
 - Dedupe against existing flights, auto-log new ones
 - Note: Public Gmail sync requires Google verification (weeks)
 
-**M4: Map & Stats**
+**M5: Map & Stats**
 - Mapbox world map
 - Flight path arcs (great circle)
 - Stats: km, countries, airlines, CO2 estimate
 
-**M5: Public Launch** (optional)
+**M6: Public Launch** (optional)
 - Custom domain
 - Rate limiting
 - Error monitoring (Sentry)

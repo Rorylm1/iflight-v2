@@ -45,77 +45,125 @@ Track progress through each milestone. Check items as completed.
 - [x] Test responsive layout (mobile + desktop)
 
 ### Deployment
-- [ ] Create Vercel project
-- [ ] Connect to Git repository (create repo first if needed)
-- [ ] Add environment variables to Vercel
-- [ ] Deploy and verify auth flow works in production
+- [x] Create Vercel project
+- [x] Connect to Git repository (create repo first if needed)
+- [x] Add environment variables to Vercel
+- [x] Deploy and verify auth flow works in production
 
 ### M1 Verification
 - [x] Can sign up with email
 - [x] Can sign in / sign out
 - [x] Dashboard shows when logged in
 - [x] Redirects to sign-in when logged out
+- [x] Deployed to Vercel and working
+
+**Live URL:** https://iflight-v2.vercel.app
+**GitHub:** https://github.com/Rorylm1/iflight-v2
+
+---
+
+## M2: Core Flight Loop ✅
+
+### Add Flight Form
+- [x] Create "Add Flight" button on dashboard
+- [x] Create flight input form (modal or slide-out)
+- [x] Flight number input with validation (e.g., BA123)
+- [x] Date picker for flight date
+- [x] Form submission handling
+- [x] Loading state during submission
+
+### Mock Enrichment
+- [x] Create `src/lib/mock-enrichment.ts`
+- [x] Generate realistic fake flight data
+- [x] Include: airline, airports, times, aircraft
+- [x] Calculate mock distance between airports
+- [x] Add random delay to simulate API call
+
+### API Route
+- [x] Create `/api/flights` POST endpoint
+- [x] Validate incoming flight number + date
+- [x] Call mock enrichment function
+- [x] Save enriched flight to Supabase
+- [x] Return saved flight data
+- [x] Handle errors gracefully
+
+### Dashboard Display
+- [x] Fetch user's flights from Supabase
+- [x] Create flight card component
+- [x] Display: flight number, airline, route, times, status
+- [x] Show departure/arrival airports with codes
+- [x] Format times in user-friendly way
+
+### Upcoming vs Past
+- [x] Split flights into upcoming/past based on date
+- [x] Create section headers for each
+- [x] Show upcoming flights first
+- [x] Sort upcoming by soonest first
+- [x] Sort past by most recent first
+- [x] Handle empty states (no flights yet)
+
+### Flight Details
+- [x] Click flight card to expand/show details
+- [x] Show all enriched data (terminal, aircraft, distance)
+- [x] Add delete flight option
+- [x] Confirm before deleting
+
+### M2 Verification
+- [x] Can add flight "BA123" for a future date
+- [x] Flight appears in Upcoming section with mock data
+- [x] Can add flight for past date, appears in Past section
+- [x] Can view flight details
+- [x] Can delete a flight
+- [x] Empty state shows when no flights
+
+---
+
+## M3: Real Flight Data
+
+### API Selection & Setup
+- [x] Research AeroDataBox API (free tier: 100 req/month)
+- [x] Create RapidAPI account (AeroDataBox is hosted there)
+- [x] Subscribe to AeroDataBox free tier
+- [x] Add `AERODATABOX_API_KEY` to `.env.local`
+- [ ] Add API key to Vercel environment variables
+- [x] Update `.env.example` with new variable
+
+### Airports Data
+- [x] In-memory airport database with ~150 major airports (src/lib/airports.ts)
+- [x] Include: IATA code, name, city, country, lat/lng
+- [x] Haversine distance calculation between airports
+- [x] Create `src/lib/airports.ts` lookup utility
+
+### Flight Enrichment API
+- [x] Create `src/lib/flight-api.ts` for AeroDataBox calls
+- [x] Implement `getFlightFromApi(flightNumber, date)` function
+- [x] Map API response to our flight schema
+- [x] Calculate distance using airport coordinates
+- [x] Update `/api/flights` route to use real API
+
+### Error Handling & Fallbacks
+- [x] Handle API rate limits (429 errors)
+- [x] Handle flight not found (falls back to mock)
+- [x] Allow partial data (e.g., if terminals unavailable)
+- [x] Fallback to mock data if API fails
+- [x] Log API errors for debugging
+
+### Caching (Optional)
+- [ ] Cache API responses in Supabase (avoid duplicate calls)
+- [ ] Cache by flight_number + date combo
+- [ ] Set reasonable TTL (e.g., 1 hour for future flights)
+
+### M3 Verification
+- [ ] Can add real flight (e.g., BA123 for tomorrow)
+- [ ] Flight shows correct airline, airports, times
+- [ ] Distance calculated from real airport coordinates
+- [ ] Handles non-existent flight gracefully
+- [ ] API errors don't crash the app
 - [ ] Deployed to Vercel and working
 
 ---
 
-## M2: Core Flight Loop
-
-### Add Flight Form
-- [ ] Create "Add Flight" button on dashboard
-- [ ] Create flight input form (modal or slide-out)
-- [ ] Flight number input with validation (e.g., BA123)
-- [ ] Date picker for flight date
-- [ ] Form submission handling
-- [ ] Loading state during submission
-
-### Mock Enrichment
-- [ ] Create `src/lib/mock-enrichment.ts`
-- [ ] Generate realistic fake flight data
-- [ ] Include: airline, airports, times, aircraft
-- [ ] Calculate mock distance between airports
-- [ ] Add random delay to simulate API call
-
-### API Route
-- [ ] Create `/api/flights` POST endpoint
-- [ ] Validate incoming flight number + date
-- [ ] Call mock enrichment function
-- [ ] Save enriched flight to Supabase
-- [ ] Return saved flight data
-- [ ] Handle errors gracefully
-
-### Dashboard Display
-- [ ] Fetch user's flights from Supabase
-- [ ] Create flight card component
-- [ ] Display: flight number, airline, route, times, status
-- [ ] Show departure/arrival airports with codes
-- [ ] Format times in user-friendly way
-
-### Upcoming vs Past
-- [ ] Split flights into upcoming/past based on date
-- [ ] Create section headers for each
-- [ ] Show upcoming flights first
-- [ ] Sort upcoming by soonest first
-- [ ] Sort past by most recent first
-- [ ] Handle empty states (no flights yet)
-
-### Flight Details
-- [ ] Click flight card to expand/show details
-- [ ] Show all enriched data (terminal, aircraft, distance)
-- [ ] Add delete flight option
-- [ ] Confirm before deleting
-
-### M2 Verification
-- [ ] Can add flight "BA123" for a future date
-- [ ] Flight appears in Upcoming section with mock data
-- [ ] Can add flight for past date, appears in Past section
-- [ ] Can view flight details
-- [ ] Can delete a flight
-- [ ] Empty state shows when no flights
-
----
-
-## M3: Gmail Sync (Personal Use)
+## M4: Gmail Sync (Personal Use)
 
 ### Google OAuth Setup
 - [ ] Create Google Cloud project
@@ -156,7 +204,7 @@ Track progress through each milestone. Check items as completed.
 - [ ] Insert new flights with `source: 'gmail'`
 - [ ] Show summary when complete (X new flights found)
 
-### M3 Verification
+### M4 Verification
 - [ ] Can connect Gmail account
 - [ ] Can disconnect Gmail account
 - [ ] Sync button fetches recent booking emails
@@ -167,7 +215,7 @@ Track progress through each milestone. Check items as completed.
 
 ---
 
-## M4: Map & Stats
+## M5: Map & Stats
 
 ### Airports Data
 - [ ] Seed `airports` table with major airports
@@ -206,7 +254,7 @@ Track progress through each milestone. Check items as completed.
 - [ ] Format numbers nicely (e.g., "12,450 km")
 - [ ] Position relative to map
 
-### M4 Verification
+### M5 Verification
 - [ ] Map displays with dark theme
 - [ ] Visited airports shown as markers
 - [ ] Flight paths drawn as arcs
@@ -215,7 +263,7 @@ Track progress through each milestone. Check items as completed.
 
 ---
 
-## M5: Public Launch (Optional)
+## M6: Public Launch (Optional)
 
 ### Production Readiness
 - [ ] Set up custom domain
@@ -245,7 +293,7 @@ Track progress through each milestone. Check items as completed.
 - [ ] Prepare app homepage for Google
 - [ ] Wait for approval (can take weeks)
 
-### M5 Verification
+### M6 Verification
 - [ ] App accessible on custom domain
 - [ ] New users can sign up and use app
 - [ ] Errors logged to Sentry
@@ -264,4 +312,3 @@ Track progress through each milestone. Check items as completed.
 - [ ] Aircraft type images
 - [ ] Airline logos
 - [ ] Real-time flight tracking for upcoming flights
-- [ ] Swap mock enrichment for real AeroDataBox API

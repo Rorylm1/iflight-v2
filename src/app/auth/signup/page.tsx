@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import Link from "next/link";
 
@@ -8,9 +9,9 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,42 +21,16 @@ export default function SignUpPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
     });
 
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      setSuccess(true);
-      setLoading(false);
+      // Email verification disabled - user is signed in immediately
+      router.push("/dashboard");
     }
   };
-
-  if (success) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-8">
-        <div className="w-full max-w-sm text-center">
-          <h1 className="text-3xl font-bold mb-2">
-            <span className="text-amber">i</span>Flight
-          </h1>
-          <div className="mt-8 p-6 bg-gray-900 border border-gray-800 rounded">
-            <div className="text-amber text-4xl mb-4">✉️</div>
-            <h2 className="text-xl font-semibold mb-2">Check your email</h2>
-            <p className="text-gray-400">
-              We&apos;ve sent a confirmation link to{" "}
-              <span className="text-white">{email}</span>
-            </p>
-          </div>
-          <p className="text-gray-500 text-sm mt-4">
-            Click the link in the email to activate your account.
-          </p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">

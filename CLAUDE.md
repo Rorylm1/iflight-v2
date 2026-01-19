@@ -23,8 +23,9 @@ npm run lint     # Run ESLint
 - **Deployment**: We will deploy on vercel with git version control
 
 ## Key Patterns
-- Flight enrichment uses mock data during dev (`src/lib/mock-enrichment.ts`)
+- Flight enrichment: mock data (`src/lib/mock-enrichment.ts`) → AeroDataBox API (M3)
 - Supabase Row Level Security ensures users only see their own flights
 - All timestamps stored as UTC (timestamptz)
+- Airports table stores IATA codes with lat/lng for distance calculations
 
 
