@@ -1,7 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getFlightFromApi } from "@/lib/flight-api";
 import { enrichFlight } from "@/lib/mock-enrichment";
-import { calculateDistance } from "@/lib/airports";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -76,12 +75,7 @@ export async function POST(request: Request) {
       const apiData = await getFlightFromApi(cleanFlightNumber, date);
 
       if (apiData) {
-        // Calculate distance using our airport coordinates
-        const distance = calculateDistance(
-          apiData.departure_airport,
-          apiData.arrival_airport
-        );
-
+        // Use distance directly from API response (works for any airport)
         enrichedData = {
           airline: apiData.airline,
           departure_airport: apiData.departure_airport,
@@ -92,7 +86,7 @@ export async function POST(request: Request) {
           arrival_terminal: apiData.arrival_terminal,
           status: apiData.status,
           aircraft: apiData.aircraft,
-          distance_km: distance, // From our airport database, not API
+          distance_km: apiData.distance_km,
         };
         console.log(`[Flight] Using real API data for ${cleanFlightNumber}`);
       } else {

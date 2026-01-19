@@ -19,9 +19,13 @@ export interface FlightApiResponse {
   arrival_terminal: string | null;
   status: string;
   aircraft: string | null;
+  distance_km: number | null;
 }
 
 interface AeroDataBoxFlight {
+  greatCircleDistance?: {
+    km?: number;
+  };
   airline?: {
     name?: string;
     iata?: string;
@@ -146,7 +150,7 @@ export async function getFlightFromApi(
       return timeStr.replace(" ", "T").replace(/Z$/, ":00Z");
     };
 
-    // Extract and map the data
+    // Extract and map the data - use API's distance directly
     const result: FlightApiResponse = {
       airline: flight.airline?.name || flight.airline?.iata || "Unknown Airline",
       departure_airport: flight.departure?.airport?.iata || "???",
@@ -157,6 +161,7 @@ export async function getFlightFromApi(
       arrival_terminal: flight.arrival?.terminal || null,
       status: mapStatus(flight.status),
       aircraft: flight.aircraft?.model || null,
+      distance_km: flight.greatCircleDistance?.km ? Math.round(flight.greatCircleDistance.km) : null,
     };
 
     console.log(`[Flight API] Success: ${result.departure_airport} → ${result.arrival_airport}`);

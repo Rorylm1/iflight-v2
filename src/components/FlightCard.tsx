@@ -14,8 +14,8 @@ export interface Flight {
   arrival_time: string;
   arrival_terminal: string | null;
   status: string;
-  aircraft: string;
-  distance_km: number;
+  aircraft: string | null;
+  distance_km: number | null;
   source: string;
   created_at: string;
 }
@@ -52,7 +52,8 @@ function formatDate(dateString: string): string {
   });
 }
 
-function formatDistance(km: number): string {
+function formatDistance(km: number | null): string {
+  if (km === null || km === undefined) return "—";
   return km.toLocaleString() + " km";
 }
 

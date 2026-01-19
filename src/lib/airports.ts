@@ -26,6 +26,12 @@ export const AIRPORTS: Record<string, Airport> = {
   MAN: { iata: "MAN", name: "Manchester Airport", city: "Manchester", country: "United Kingdom", lat: 53.3537, lng: -2.2750 },
   EDI: { iata: "EDI", name: "Edinburgh Airport", city: "Edinburgh", country: "United Kingdom", lat: 55.9500, lng: -3.3725 },
   BHX: { iata: "BHX", name: "Birmingham Airport", city: "Birmingham", country: "United Kingdom", lat: 52.4539, lng: -1.7480 },
+  INV: { iata: "INV", name: "Inverness Airport", city: "Inverness", country: "United Kingdom", lat: 57.5425, lng: -4.0475 },
+  GLA: { iata: "GLA", name: "Glasgow Airport", city: "Glasgow", country: "United Kingdom", lat: 55.8719, lng: -4.4331 },
+  BRS: { iata: "BRS", name: "Bristol Airport", city: "Bristol", country: "United Kingdom", lat: 51.3827, lng: -2.7190 },
+  NCL: { iata: "NCL", name: "Newcastle Airport", city: "Newcastle", country: "United Kingdom", lat: 55.0375, lng: -1.6917 },
+  BFS: { iata: "BFS", name: "Belfast International", city: "Belfast", country: "United Kingdom", lat: 54.6575, lng: -6.2158 },
+  LBA: { iata: "LBA", name: "Leeds Bradford Airport", city: "Leeds", country: "United Kingdom", lat: 53.8659, lng: -1.6606 },
 
   // United States
   JFK: { iata: "JFK", name: "John F. Kennedy International", city: "New York", country: "United States", lat: 40.6413, lng: -73.7781 },
