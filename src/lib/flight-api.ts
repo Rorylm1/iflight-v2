@@ -111,8 +111,9 @@ export async function getFlightFromApi(
       },
     });
 
-    if (response.status === 404) {
-      console.log(`[Flight API] Flight not found: ${cleanFlightNumber}`);
+    // 204 = No Content (flight not found) - API returns this instead of 404
+    if (response.status === 204 || response.status === 404) {
+      console.log(`[Flight API] Flight not found: ${cleanFlightNumber} (${response.status})`);
       return null;
     }
 
@@ -138,14 +139,21 @@ export async function getFlightFromApi(
 
     const flight = data[0];
 
+    // Convert API time format "2026-01-20 14:10Z" to ISO "2026-01-20T14:10:00Z"
+    const toIsoTime = (timeStr?: string): string => {
+      if (!timeStr) return new Date().toISOString();
+      // Replace space with T and ensure seconds are included
+      return timeStr.replace(" ", "T").replace(/Z$/, ":00Z");
+    };
+
     // Extract and map the data
     const result: FlightApiResponse = {
       airline: flight.airline?.name || flight.airline?.iata || "Unknown Airline",
       departure_airport: flight.departure?.airport?.iata || "???",
-      departure_time: flight.departure?.scheduledTime?.utc || new Date().toISOString(),
+      departure_time: toIsoTime(flight.departure?.scheduledTime?.utc),
       departure_terminal: flight.departure?.terminal || null,
       arrival_airport: flight.arrival?.airport?.iata || "???",
-      arrival_time: flight.arrival?.scheduledTime?.utc || new Date().toISOString(),
+      arrival_time: toIsoTime(flight.arrival?.scheduledTime?.utc),
       arrival_terminal: flight.arrival?.terminal || null,
       status: mapStatus(flight.status),
       aircraft: flight.aircraft?.model || null,
