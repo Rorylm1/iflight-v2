@@ -185,10 +185,12 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
                 <span className="mr-2">{countryToFlag(flight.departure_country)}</span>
                 {flight.departure_airport_name || flight.departure_airport}
               </div>
-              {flight.departure_time_actual && flight.departure_time_actual !== flight.departure_time && (
-                <div className="text-amber text-xs mt-1">
-                  Revised: {formatTime(flight.departure_time_actual)}
-                </div>
+              {flight.departure_time_actual && (
+                (flight.status === "landed" || flight.status === "active" || flight.departure_time_actual !== flight.departure_time) && (
+                  <div className="text-amber text-xs mt-1">
+                    {flight.status === "landed" || flight.status === "active" ? "Departed" : "Revised"}: {formatTime(flight.departure_time_actual)}
+                  </div>
+                )
               )}
             </div>
             <div>
@@ -199,10 +201,12 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
                 <span className="mr-2">{countryToFlag(flight.arrival_country)}</span>
                 {flight.arrival_airport_name || flight.arrival_airport}
               </div>
-              {flight.arrival_time_actual && flight.arrival_time_actual !== flight.arrival_time && (
-                <div className="text-green-400 text-xs mt-1">
-                  Expected: {formatTime(flight.arrival_time_actual)}
-                </div>
+              {flight.arrival_time_actual && (
+                (flight.status === "landed" || flight.arrival_time_actual !== flight.arrival_time) && (
+                  <div className="text-green-400 text-xs mt-1">
+                    {flight.status === "landed" ? "Landed" : "Expected"}: {formatTime(flight.arrival_time_actual)}
+                  </div>
+                )
               )}
             </div>
           </div>

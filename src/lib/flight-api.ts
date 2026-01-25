@@ -182,13 +182,17 @@ export async function getFlightFromApi(
       departure_airport_name: flight.departure?.airport?.name || null,
       departure_country: flight.departure?.airport?.countryCode || null,
       departure_time: toIsoTime(flight.departure?.scheduledTime?.utc),
-      departure_time_actual: flight.departure?.revisedTime?.utc ? toIsoTime(flight.departure.revisedTime.utc) : null,
+      departure_time_actual: flight.departure?.actualTime?.utc
+        ? toIsoTime(flight.departure.actualTime.utc)
+        : (flight.departure?.revisedTime?.utc ? toIsoTime(flight.departure.revisedTime.utc) : null),
       departure_terminal: flight.departure?.terminal || null,
       arrival_airport: flight.arrival?.airport?.iata || "???",
       arrival_airport_name: flight.arrival?.airport?.name || null,
       arrival_country: flight.arrival?.airport?.countryCode || null,
       arrival_time: toIsoTime(flight.arrival?.scheduledTime?.utc),
-      arrival_time_actual: flight.arrival?.predictedTime?.utc ? toIsoTime(flight.arrival.predictedTime.utc) : null,
+      arrival_time_actual: flight.arrival?.actualTime?.utc
+        ? toIsoTime(flight.arrival.actualTime.utc)
+        : (flight.arrival?.predictedTime?.utc ? toIsoTime(flight.arrival.predictedTime.utc) : null),
       arrival_terminal: flight.arrival?.terminal || null,
       status,
       aircraft: flight.aircraft?.model || null,
@@ -196,6 +200,7 @@ export async function getFlightFromApi(
     };
 
     console.log(`[Flight API] Success: ${result.departure_airport} → ${result.arrival_airport}`);
+    console.log(`[Flight API] Actual times - Dep: ${result.departure_time_actual}, Arr: ${result.arrival_time_actual}`);
     return result;
   } catch (error) {
     if (error instanceof Error && error.message.includes("API")) {
