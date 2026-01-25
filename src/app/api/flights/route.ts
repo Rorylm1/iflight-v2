@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getFlightFromApi } from "@/lib/flight-api";
+import { getCachedFlight, cacheFlight } from "@/lib/flight-cache";
 import { enrichFlight } from "@/lib/mock-enrichment";
 import { NextResponse } from "next/server";
 
@@ -70,42 +71,55 @@ export async function POST(request: Request) {
     let enrichedData;
     let dataSource = "api"; // Track where data came from
 
-    // Try real API first, fall back to mock if it fails
-    try {
-      const apiData = await getFlightFromApi(cleanFlightNumber, date);
+    // Check cache first (only landed flights are cached)
+    const cachedData = await getCachedFlight(supabase, cleanFlightNumber, date);
+    if (cachedData) {
+      console.log(`[Flight] Cache hit for ${cleanFlightNumber} on ${date}`);
+      enrichedData = cachedData;
+      dataSource = "cache";
+    } else {
+      // Try real API, fall back to mock if it fails
+      try {
+        const apiData = await getFlightFromApi(cleanFlightNumber, date);
 
-      if (apiData) {
-        // Use all data from API response
-        enrichedData = {
-          airline: apiData.airline,
-          departure_airport: apiData.departure_airport,
-          departure_airport_name: apiData.departure_airport_name,
-          departure_country: apiData.departure_country,
-          departure_time: apiData.departure_time,
-          departure_time_actual: apiData.departure_time_actual,
-          departure_terminal: apiData.departure_terminal,
-          arrival_airport: apiData.arrival_airport,
-          arrival_airport_name: apiData.arrival_airport_name,
-          arrival_country: apiData.arrival_country,
-          arrival_time: apiData.arrival_time,
-          arrival_time_actual: apiData.arrival_time_actual,
-          arrival_terminal: apiData.arrival_terminal,
-          status: apiData.status,
-          aircraft: apiData.aircraft,
-          distance_km: apiData.distance_km,
-        };
-        console.log(`[Flight] Using real API data for ${cleanFlightNumber}`);
-      } else {
-        // Flight not found in API - fall back to mock
-        console.log(`[Flight] Flight not found in API, using mock for ${cleanFlightNumber}`);
+        if (apiData) {
+          // Use all data from API response
+          enrichedData = {
+            airline: apiData.airline,
+            departure_airport: apiData.departure_airport,
+            departure_airport_name: apiData.departure_airport_name,
+            departure_country: apiData.departure_country,
+            departure_time: apiData.departure_time,
+            departure_time_actual: apiData.departure_time_actual,
+            departure_terminal: apiData.departure_terminal,
+            arrival_airport: apiData.arrival_airport,
+            arrival_airport_name: apiData.arrival_airport_name,
+            arrival_country: apiData.arrival_country,
+            arrival_time: apiData.arrival_time,
+            arrival_time_actual: apiData.arrival_time_actual,
+            arrival_terminal: apiData.arrival_terminal,
+            status: apiData.status,
+            aircraft: apiData.aircraft,
+            distance_km: apiData.distance_km,
+          };
+          console.log(`[Flight] Using real API data for ${cleanFlightNumber}`);
+
+          // Cache if landed (don't await - fire and forget)
+          if (apiData.status === "landed") {
+            cacheFlight(supabase, cleanFlightNumber, date, apiData);
+          }
+        } else {
+          // Flight not found in API - fall back to mock
+          console.log(`[Flight] Flight not found in API, using mock for ${cleanFlightNumber}`);
+          enrichedData = await enrichFlight(cleanFlightNumber, date);
+          dataSource = "mock";
+        }
+      } catch (apiError) {
+        // API error (rate limit, network, etc.) - fall back to mock
+        console.warn(`[Flight] API error, falling back to mock:`, apiError);
         enrichedData = await enrichFlight(cleanFlightNumber, date);
         dataSource = "mock";
       }
-    } catch (apiError) {
-      // API error (rate limit, network, etc.) - fall back to mock
-      console.warn(`[Flight] API error, falling back to mock:`, apiError);
-      enrichedData = await enrichFlight(cleanFlightNumber, date);
-      dataSource = "mock";
     }
 
     // Save to Supabase
@@ -132,7 +146,7 @@ export async function POST(request: Request) {
         status: enrichedData.status,
         aircraft: enrichedData.aircraft,
         distance_km: enrichedData.distance_km,
-        source: dataSource === "api" ? "manual" : "manual:estimated",
+        source: dataSource === "mock" ? "manual:estimated" : "manual",
       })
       .select()
       .single();

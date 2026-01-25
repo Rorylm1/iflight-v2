@@ -167,6 +167,15 @@ export async function getFlightFromApi(
     };
 
     // Extract and map the data - use API's distance directly
+    // Determine status - override to "landed" for past flights if API says "scheduled"
+    let status = mapStatus(flight.status);
+    const flightDate = new Date(date + "T23:59:59");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (flightDate < today && status === "scheduled") {
+      status = "landed";
+    }
+
     const result: FlightApiResponse = {
       airline: flight.airline?.name || flight.airline?.iata || "Unknown Airline",
       departure_airport: flight.departure?.airport?.iata || "???",
@@ -181,7 +190,7 @@ export async function getFlightFromApi(
       arrival_time: toIsoTime(flight.arrival?.scheduledTime?.utc),
       arrival_time_actual: flight.arrival?.predictedTime?.utc ? toIsoTime(flight.arrival.predictedTime.utc) : null,
       arrival_terminal: flight.arrival?.terminal || null,
-      status: mapStatus(flight.status),
+      status,
       aircraft: flight.aircraft?.model || null,
       distance_km: flight.greatCircleDistance?.km ? Math.round(flight.greatCircleDistance.km) : null,
     };

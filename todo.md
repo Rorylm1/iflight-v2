@@ -118,14 +118,14 @@ Track progress through each milestone. Check items as completed.
 
 ---
 
-## M3: Real Flight Data
+## M3: Real Flight Data ✅
 
 ### API Selection & Setup
 - [x] Research AeroDataBox API (free tier: 100 req/month)
 - [x] Create RapidAPI account (AeroDataBox is hosted there)
 - [x] Subscribe to AeroDataBox free tier
 - [x] Add `AERODATABOX_API_KEY` to `.env.local`
-- [ ] Add API key to Vercel environment variables
+- [x] Add API key to Vercel environment variables
 - [x] Update `.env.example` with new variable
 
 ### Airports Data
@@ -147,19 +147,20 @@ Track progress through each milestone. Check items as completed.
 - [x] Allow partial data (e.g., if terminals unavailable)
 - [x] Fallback to mock data if API fails
 - [x] Log API errors for debugging
+- [x] Override "scheduled" status to "landed" for past flights
 
-### Caching (Optional)
-- [ ] Cache API responses in Supabase (avoid duplicate calls)
-- [ ] Cache by flight_number + date combo
-- [ ] Set reasonable TTL (e.g., 1 hour for future flights)
+### Caching
+- [x] Cache API responses in Supabase (avoid duplicate calls)
+- [x] Cache by flight_number + date combo
+- [x] Only cache "landed" flights (future flights always need live data)
 
 ### M3 Verification
-- [ ] Can add real flight (e.g., BA123 for tomorrow)
-- [ ] Flight shows correct airline, airports, times
-- [ ] Distance calculated from real airport coordinates
-- [ ] Handles non-existent flight gracefully
-- [ ] API errors don't crash the app
-- [ ] Deployed to Vercel and working
+- [x] Can add real flight (e.g., BA123 for tomorrow)
+- [x] Flight shows correct airline, airports, times
+- [x] Distance calculated from real airport coordinates
+- [x] Handles non-existent flight gracefully
+- [x] API errors don't crash the app
+- [x] Deployed to Vercel and working
 
 ---
 

@@ -90,12 +90,12 @@ create policy "Users see own flights" on flights
 - Save to Supabase, display on dashboard
 - Upcoming/past sections
 
-**M3: Real Flight Data**
+**M3: Real Flight Data** ✅
 - Replace mock enrichment with AeroDataBox API
 - Seed airports table with real IATA codes, coordinates
 - Calculate accurate flight distances
 - Handle API errors gracefully (fallback to partial data)
-- Cache responses to minimize API usage
+- Cache responses to minimize API usage (optional)
 
 **M4: Gmail Sync** (personal use only)
 - Google OAuth in test mode (no app verification needed)
