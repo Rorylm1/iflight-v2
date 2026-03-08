@@ -109,9 +109,11 @@ ${email.body}`;
       }),
     });
 
+    // Get response text first to handle non-JSON errors
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const error = await response.text();
-      console.error("[Email Parser] OpenAI API error:", error);
+      console.error("[Email Parser] OpenAI API error:", response.status, responseText);
       return {
         flights: [],
         confidence: 0,
@@ -120,7 +122,19 @@ ${email.body}`;
       };
     }
 
-    const data = await response.json();
+    // Try to parse as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("[Email Parser] Failed to parse OpenAI response:", responseText.substring(0, 200));
+      return {
+        flights: [],
+        confidence: 0,
+        model,
+        error: "Invalid response from OpenAI",
+      };
+    }
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
