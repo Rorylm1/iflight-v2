@@ -50,6 +50,10 @@ interface AeroDataBoxFlight {
       utc?: string;
       local?: string;
     };
+    actualTime?: {
+      utc?: string;
+      local?: string;
+    };
     terminal?: string;
   };
   arrival?: {
@@ -63,6 +67,10 @@ interface AeroDataBoxFlight {
       local?: string;
     };
     predictedTime?: {
+      utc?: string;
+      local?: string;
+    };
+    actualTime?: {
       utc?: string;
       local?: string;
     };
