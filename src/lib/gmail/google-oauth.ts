@@ -211,8 +211,16 @@ export function verifyState(state: string): string | null {
  * Get default redirect URI based on environment
  */
 function getDefaultRedirectUri(): string {
-  // In production, use the actual domain
-  // For local development, use localhost
+  // Use explicit production URL if set, otherwise fall back to Vercel URL
+  // IMPORTANT: VERCEL_URL changes per deployment, so we prefer a stable URL
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return `${process.env.NEXT_PUBLIC_APP_URL}/api/gmail/callback`;
+  }
+  // For production on Vercel, use the production domain (not preview URLs)
+  if (process.env.VERCEL_ENV === "production") {
+    return "https://iflight-v2.vercel.app/api/gmail/callback";
+  }
+  // For preview deployments
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}/api/gmail/callback`;
   }
