@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { calculateFlightCO2, formatCO2 } from "@/lib/co2-calculator";
 
 export interface Flight {
   id: string;
@@ -237,10 +238,12 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
             </div>
             <div>
               <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Data
+                CO₂ Emissions
               </div>
-              <div className="font-mono text-sm">
-                {flight.source.includes("estimated") ? "Estimated" : "Live API"}
+              <div className="font-mono text-sm text-amber">
+                {flight.distance_km
+                  ? formatCO2(calculateFlightCO2(flight.distance_km).co2Kg)
+                  : "—"}
               </div>
             </div>
           </div>

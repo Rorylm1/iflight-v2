@@ -218,6 +218,13 @@ Track progress through each milestone. Check items as completed.
 
 ## M5: Map & Stats
 
+### CO2 Emissions Calculator
+- [ ] Create CO2 calculation utility (distance-based with haul factors)
+- [ ] Add CO2 estimate to individual flight cards
+- [ ] Add total CO2 to dashboard stats section
+- [ ] Create Stats tab with detailed CO2 breakdown
+- [ ] Show comparison (e.g., "equivalent to X trees for a year")
+
 ### Airports Data
 - [ ] Seed `airports` table with major airports
 - [ ] Include: IATA code, name, city, country, lat/lng

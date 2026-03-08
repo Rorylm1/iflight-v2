@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import FlightCard, { Flight } from "./FlightCard";
 import AddFlightModal from "./AddFlightModal";
 import GmailConnect from "./GmailConnect";
+import StatsPanel from "./StatsPanel";
+import { calculateFlightCO2, formatCO2, getTreeEquivalent } from "@/lib/co2-calculator";
 
 export default function FlightList() {
   const [flights, setFlights] = useState<Flight[]>([]);
@@ -61,6 +63,15 @@ export default function FlightList() {
     flights.flatMap((f) => [f.departure_airport, f.arrival_airport])
   ).size;
   const uniqueAirlines = new Set(flights.map((f) => f.airline)).size;
+
+  // Calculate total CO2 emissions
+  const totalCO2 = landedFlights.reduce((sum, f) => {
+    if (f.distance_km) {
+      return sum + calculateFlightCO2(f.distance_km).co2Kg;
+    }
+    return sum;
+  }, 0);
+  const treesNeeded = getTreeEquivalent(totalCO2);
 
   if (isLoading) {
     return (
@@ -171,7 +182,7 @@ export default function FlightList() {
       )}
 
       {/* Stats */}
-      <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-gray-900 border border-gray-800 rounded p-4">
           <div className="text-2xl font-mono text-amber">{flights.length}</div>
           <div className="text-sm text-gray-400">Total Flights</div>
@@ -180,7 +191,7 @@ export default function FlightList() {
           <div className="text-2xl font-mono text-amber">
             {totalDistance.toLocaleString()} km
           </div>
-          <div className="text-sm text-gray-400">Distance</div>
+          <div className="text-sm text-gray-400">Distance Flown</div>
         </div>
         <div className="bg-gray-900 border border-gray-800 rounded p-4">
           <div className="text-2xl font-mono text-amber">{uniqueAirports}</div>
@@ -190,7 +201,22 @@ export default function FlightList() {
           <div className="text-2xl font-mono text-amber">{uniqueAirlines}</div>
           <div className="text-sm text-gray-400">Airlines</div>
         </div>
+        <div className="bg-gray-900 border border-gray-800 rounded p-4">
+          <div className="text-2xl font-mono text-amber">{formatCO2(totalCO2)}</div>
+          <div className="text-sm text-gray-400">CO₂ Emissions</div>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded p-4">
+          <div className="text-2xl font-mono text-green-400">🌳 {treesNeeded}</div>
+          <div className="text-sm text-gray-400">Trees to Offset</div>
+        </div>
       </div>
+
+      {/* Stats Panel */}
+      {flights.length > 0 && (
+        <div className="mt-12">
+          <StatsPanel flights={flights} />
+        </div>
+      )}
 
       {/* Gmail Sync */}
       <div className="mt-12 bg-gray-900 border border-gray-800 rounded-lg p-6">

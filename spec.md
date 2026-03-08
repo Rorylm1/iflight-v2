@@ -139,6 +139,8 @@ create policy "Users see own flights" on flights
 - Note: Public Gmail sync requires Google verification (weeks)
 
 **M5: Map & Stats**
+- CO2 emissions calculator and display
+- Stats dashboard with total/per-flight emissions
 - Mapbox world map
 - Flight path arcs (great circle)
 - Stats: km, countries, airlines, CO2 estimate
