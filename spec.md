@@ -7,9 +7,9 @@ Personal flight tracking app — log flights, view dashboard, visualise history 
 **MVP**
 - Manual flight logging: enter flight number + date → system enriches with full details
 - Flight dashboard: upcoming/past flights with times, airports, terminals, status
+- Gmail sync: button triggers AI parsing of booking emails → auto-logs flights
 
 **Future**
-- Gmail sync: button triggers AI parsing of booking emails → auto-logs flights
 - Flight map: world map showing all routes + stats (miles, countries, CO2)
 
 ## Tech Stack
@@ -20,10 +20,11 @@ Personal flight tracking app — log flights, view dashboard, visualise history 
 | Database | Supabase (Postgres) |
 | Auth | Supabase Auth |
 | Styling | Tailwind CSS |
-| Flight API | Mock data → AeroDataBox (later) |
+| Flight API | AeroDataBox (via RapidAPI) |
 | Deployment | Vercel |
+| Gmail API | Google OAuth + Gmail API |
+| AI Parsing | OpenAI GPT-4o-mini |
 | Maps (later) | Mapbox GL JS |
-| AI (later) | OpenAI GPT-4o-mini |
 
 ## Database Schema
 
@@ -63,6 +64,37 @@ create table airports (
   lng decimal
 );
 
+create table gmail_connections (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid unique references auth.users not null,
+  google_email text,
+  access_token text,
+  refresh_token text,
+  token_expires_at timestamptz,
+  scopes text,
+  last_sync_at timestamptz,
+  last_sync_status text,
+  last_sync_error text,
+  connected_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table gmail_sync_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users not null,
+  gmail_message_id text,
+  gmail_thread_id text,
+  processed_at timestamptz default now(),
+  parse_status text,
+  flights_found integer default 0,
+  raw_subject text,
+  raw_from text,
+  parse_confidence float,
+  parse_model text,
+  error_message text,
+  unique(user_id, gmail_message_id)
+);
+
 alter table flights enable row level security;
 create policy "Users see own flights" on flights
   for all using (auth.uid() = user_id);
@@ -97,11 +129,13 @@ create policy "Users see own flights" on flights
 - Handle API errors gracefully (fallback to partial data)
 - Cache responses to minimize API usage (optional)
 
-**M4: Gmail Sync** (personal use only)
-- Google OAuth in test mode (no app verification needed)
-- Fetch booking emails from last 90 days
-- OpenAI parsing → extract flight number + date
-- Dedupe against existing flights, auto-log new ones
+**M4: Gmail Sync** ✅ (personal use, test mode)
+- Google OAuth with CSRF-protected state parameter
+- Gmail API with `gmail.readonly` scope, hybrid search (airline senders + keywords)
+- OpenAI gpt-4o-mini parsing → extract flight numbers + dates from emails
+- Multi-phase sync: fetch → parse → deduplicate → enrich → save
+- 365-day lookback (configurable), deduplication via `gmail_sync_logs` table
+- No external SDKs — all via fetch API (lower bundle size)
 - Note: Public Gmail sync requires Google verification (weeks)
 
 **M5: Map & Stats**

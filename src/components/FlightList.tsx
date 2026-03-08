@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import FlightCard, { Flight } from "./FlightCard";
 import AddFlightModal from "./AddFlightModal";
+import GmailConnect from "./GmailConnect";
 
 export default function FlightList() {
   const [flights, setFlights] = useState<Flight[]>([]);
@@ -189,6 +190,15 @@ export default function FlightList() {
           <div className="text-2xl font-mono text-amber">{uniqueAirlines}</div>
           <div className="text-sm text-gray-400">Airlines</div>
         </div>
+      </div>
+
+      {/* Gmail Sync */}
+      <div className="mt-12 bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Import from Gmail</h2>
+        <p className="text-gray-400 text-sm mb-4">
+          Connect your Gmail to automatically find and import flight bookings from your inbox.
+        </p>
+        <GmailConnect onSyncComplete={fetchFlights} />
       </div>
 
       {/* Add Flight Modal */}

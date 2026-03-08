@@ -164,55 +164,55 @@ Track progress through each milestone. Check items as completed.
 
 ---
 
-## M4: Gmail Sync (Personal Use)
+## M4: Gmail Sync (Personal Use) ✅
 
 ### Google OAuth Setup
-- [ ] Create Google Cloud project
-- [ ] Enable Gmail API
-- [ ] Configure OAuth consent screen (test mode)
-- [ ] Create OAuth credentials
-- [ ] Add authorized redirect URIs
-- [ ] Add credentials to environment variables
+- [x] Create Google Cloud project
+- [x] Enable Gmail API
+- [x] Configure OAuth consent screen (test mode)
+- [x] Create OAuth credentials
+- [x] Add authorized redirect URIs
+- [x] Add credentials to environment variables
 
 ### OAuth Flow
-- [ ] Add "Connect Gmail" button to dashboard
-- [ ] Create `/api/auth/google` to initiate OAuth
-- [ ] Create `/api/auth/google/callback` to handle return
-- [ ] Store refresh token securely in Supabase
-- [ ] Handle token refresh when expired
-- [ ] Show connected/disconnected state in UI
+- [x] Add "Connect Gmail" button to dashboard
+- [x] Create `/api/gmail/auth` to initiate OAuth
+- [x] Create `/api/gmail/callback` to handle return
+- [x] Store refresh token securely in Supabase
+- [x] Handle token refresh when expired
+- [x] Show connected/disconnected state in UI
 
 ### Email Fetching
-- [ ] Create Gmail API client utility
-- [ ] Fetch emails with booking-related queries
-- [ ] Filter to last 90 days
-- [ ] Extract email body/HTML content
-- [ ] Handle pagination for many emails
+- [x] Create Gmail API client utility (`src/lib/gmail/gmail-api.ts`)
+- [x] Fetch emails with booking-related queries (hybrid: airline senders + keywords)
+- [x] Filter to last 365 days (configurable)
+- [x] Extract email body/HTML content (multipart MIME, base64 decoding)
+- [x] Handle pagination for many emails
 
 ### AI Parsing
-- [ ] Set up OpenAI client
-- [ ] Create prompt for extracting flight details
-- [ ] Parse: flight number, date, airports (if available)
-- [ ] Handle multiple flights in one email
-- [ ] Handle parsing failures gracefully
-- [ ] Log confidence/uncertainty
+- [x] Set up OpenAI client (via fetch API, no SDK)
+- [x] Create prompt for extracting flight details
+- [x] Parse: flight number, date, airports (if available)
+- [x] Handle multiple flights in one email
+- [x] Handle parsing failures gracefully
+- [x] Log confidence/uncertainty
 
 ### Sync Flow
-- [ ] Create "Sync Flights" button
-- [ ] Show sync progress (X of Y emails)
-- [ ] Check for duplicate flights before inserting
-- [ ] Use `gmail_message_id` for deduplication
-- [ ] Insert new flights with `source: 'gmail'`
-- [ ] Show summary when complete (X new flights found)
+- [x] Create "Sync Flights" button (`GmailSyncButton.tsx`)
+- [x] Show sync progress (emails scanned, flights found, new/duplicates)
+- [x] Check for duplicate flights before inserting
+- [x] Use `gmail_message_id` for deduplication (via `gmail_sync_logs` table)
+- [x] Insert new flights with `source: 'gmail'`
+- [x] Show summary when complete (new flights with details)
 
 ### M4 Verification
-- [ ] Can connect Gmail account
-- [ ] Can disconnect Gmail account
-- [ ] Sync button fetches recent booking emails
-- [ ] AI extracts flight details correctly
-- [ ] New flights appear on dashboard
-- [ ] Duplicates are not created
-- [ ] Handles emails with no flight info gracefully
+- [x] Can connect Gmail account
+- [x] Can disconnect Gmail account
+- [x] Sync button fetches recent booking emails
+- [x] AI extracts flight details correctly
+- [x] New flights appear on dashboard
+- [x] Duplicates are not created
+- [x] Handles emails with no flight info gracefully
 
 ---
 

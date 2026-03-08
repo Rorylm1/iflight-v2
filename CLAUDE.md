@@ -19,13 +19,23 @@ npm run lint     # Run ESLint
 - **Framework**: Next.js 14 (App Router) — pages in `src/app/`
 - **Database**: Supabase (Postgres + Auth) — client in `src/lib/supabase.ts`
 - **Styling**: Tailwind CSS, dark theme with amber accents
-- **API Routes**: `src/app/api/` — server-side logic for flight enrichment
-- **Deployment**: We will deploy on vercel with git version control
+- **API Routes**: `src/app/api/` — server-side logic for flight enrichment + Gmail sync
+- **Gmail Sync**: Google OAuth + Gmail API + OpenAI parsing — `src/lib/gmail/`
+- **Deployment**: Deployed on Vercel with git version control
 
 ## Key Patterns
-- Flight enrichment: mock data (`src/lib/mock-enrichment.ts`) → AeroDataBox API (M3)
-- Supabase Row Level Security ensures users only see their own flights
+- Flight enrichment: AeroDataBox API with mock fallback (`src/lib/mock-enrichment.ts`)
+- Gmail sync: fetch emails → OpenAI parse → deduplicate → enrich → save (`src/lib/gmail/sync-service.ts`)
+- No external SDKs for Google/OpenAI — all via fetch API for smaller bundle
+- Supabase Row Level Security ensures users only see their own data (flights, gmail_connections, sync_logs)
 - All timestamps stored as UTC (timestamptz)
 - Airports table stores IATA codes with lat/lng for distance calculations
+- Flight cache stores landed flights to minimize API calls
+
+## Current Progress
+- **M1-M3**: Complete (Foundation, Core Flight Loop, Real Flight Data)
+- **M4**: Complete (Gmail Sync)
+- **M5**: Pending (Map & Stats)
+- **Next milestone**: M5 — Mapbox world map with flight paths and stats
 
 
