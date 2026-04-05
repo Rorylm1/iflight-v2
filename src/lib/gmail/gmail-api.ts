@@ -66,14 +66,29 @@ export async function searchEmails(
     params.set("pageToken", pageToken);
   }
 
-  const response = await fetch(
-    `${GMAIL_API_BASE}/users/me/messages?${params.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+  // Add timeout for fail-fast behavior
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+  let response: Response;
+  try {
+    response = await fetch(
+      `${GMAIL_API_BASE}/users/me/messages?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        signal: controller.signal,
+      }
+    );
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("Gmail search timed out. Please try again.");
     }
-  );
+    throw err;
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     const error = await response.text();
@@ -99,14 +114,29 @@ export async function getEmailDetail(
   accessToken: string,
   messageId: string
 ): Promise<GmailMessageDetail> {
-  const response = await fetch(
-    `${GMAIL_API_BASE}/users/me/messages/${messageId}?format=full`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+  // Add timeout for fail-fast behavior
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+  let response: Response;
+  try {
+    response = await fetch(
+      `${GMAIL_API_BASE}/users/me/messages/${messageId}?format=full`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        signal: controller.signal,
+      }
+    );
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("Email fetch timed out");
     }
-  );
+    throw err;
+  }
+  clearTimeout(timeoutId);
 
   if (!response.ok) {
     const error = await response.text();

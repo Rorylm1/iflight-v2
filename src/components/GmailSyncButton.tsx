@@ -41,9 +41,19 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
         },
         body: JSON.stringify({
           lookbackDays: 365, // 12 months
-          maxEmails: 100,
+          maxEmails: 20, // Reduced to avoid timeouts
         }),
       });
+
+      // Handle non-JSON responses (timeouts return HTML)
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        // Server returned HTML error page (timeout, 502, 504, etc.)
+        if (response.status === 504 || response.status === 502) {
+          throw new Error("Sync timed out. Try disconnecting and reconnecting Gmail, then sync again.");
+        }
+        throw new Error(`Server error (${response.status}). Please try again.`);
+      }
 
       const data = await response.json();
 
@@ -58,7 +68,12 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
         onSyncComplete();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sync failed");
+      // Handle JSON parse errors specifically
+      if (err instanceof SyntaxError) {
+        setError("Sync timed out. The server took too long to respond. Please try again.");
+      } else {
+        setError(err instanceof Error ? err.message : "Sync failed");
+      }
     } finally {
       setSyncing(false);
     }

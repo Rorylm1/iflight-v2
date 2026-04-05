@@ -92,22 +92,42 @@ Body:
 ${email.body}`;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userMessage },
-        ],
-        temperature: 0.1, // Low temperature for consistent extraction
-        max_tokens: 1000,
-      }),
-    });
+    // Add timeout for fail-fast behavior (OpenAI can be slow)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout per email
+
+    let response: Response;
+    try {
+      response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userMessage },
+          ],
+          temperature: 0.1, // Low temperature for consistent extraction
+          max_tokens: 500, // Reduced for faster responses
+        }),
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError instanceof Error && fetchError.name === "AbortError") {
+        return {
+          flights: [],
+          confidence: 0,
+          model,
+          error: "AI parsing timed out",
+        };
+      }
+      throw fetchError;
+    }
+    clearTimeout(timeoutId);
 
     // Get response text first to handle non-JSON errors
     const responseText = await response.text();

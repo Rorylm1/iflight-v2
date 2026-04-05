@@ -259,7 +259,13 @@ export async function runGmailSync(
   options: SyncOptions = {},
   onProgress?: (progress: SyncProgress) => void
 ): Promise<SyncResult> {
-  const { lookbackDays = 365, maxEmails = 100 } = options;
+  // Cap emails to avoid Vercel timeout (hobby tier = 10s)
+  // Each email takes ~3-5s to process (fetch + AI parse + enrich)
+  const MAX_EMAILS_PER_SYNC = 5;
+  const { lookbackDays = 365, maxEmails = 20 } = options;
+  const effectiveMaxEmails = Math.min(maxEmails, MAX_EMAILS_PER_SYNC);
+
+  const syncStartTime = Date.now();
 
   const result: SyncResult = {
     success: false,
@@ -296,8 +302,9 @@ export async function runGmailSync(
 
     const query = buildSimpleQuery(lookbackDays);
     console.log("[Sync] Gmail query:", query);
+    console.log("[Sync] Max emails to process:", effectiveMaxEmails);
 
-    const searchResult = await searchEmails(accessToken, query, maxEmails);
+    const searchResult = await searchEmails(accessToken, query, effectiveMaxEmails);
     const messageIds = searchResult.messages.map((m) => m.id);
     result.stats.emailsFound = messageIds.length;
 
@@ -367,6 +374,14 @@ export async function runGmailSync(
 
     for (let i = 0; i < emails.length; i++) {
       const email = emails[i];
+
+      // Check if we're running out of time (stop at 8 seconds to allow cleanup)
+      const elapsedMs = Date.now() - syncStartTime;
+      if (elapsedMs > 8000) {
+        console.log(`[Sync] Stopping early - ${elapsedMs}ms elapsed, processed ${i} emails`);
+        result.errors.push(`Processed ${i} of ${emails.length} emails before timeout`);
+        break;
+      }
 
       onProgress?.({
         phase: "parsing",
