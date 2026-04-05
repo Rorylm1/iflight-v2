@@ -35,7 +35,13 @@ npm run lint     # Run ESLint
 ## Current Progress
 - **M1-M3**: Complete (Foundation, Core Flight Loop, Real Flight Data)
 - **M4**: Complete (Gmail Sync)
-- **M5**: Pending (Map & Stats)
-- **Next milestone**: M5 — Mapbox world map with flight paths and stats
+- **M5**: Complete (Map & Carbon Impact)
+- **Next milestone**: M6 (optional) — Public Launch features
+
+## M5 Components
+- `/map` page with Mapbox globe visualization and carbon insights
+- `FlightMap.tsx` — Great circle arc routes, airport markers with hover popups
+- `CarbonInsights.tsx` — AI-generated equivalents, offset suggestions, tips
+- `/api/carbon-equivalents` — OpenAI-powered dynamic comparisons
 
 

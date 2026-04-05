@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
@@ -12,6 +12,7 @@ interface HeaderProps {
 export default function Header({ user }: HeaderProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
 
   const handleSignOut = async () => {
@@ -21,16 +22,42 @@ export default function Header({ user }: HeaderProps) {
     router.refresh();
   };
 
+  const navItems = [
+    { href: "/dashboard", label: "Flights", icon: "✈️" },
+    { href: "/map", label: "Map & Stats", icon: "🌍" },
+  ];
+
   return (
     <header className="border-b border-gray-800 bg-gray-950/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="/dashboard" className="text-xl font-bold">
-          <span className="text-amber">i</span>Flight
-        </a>
+        <div className="flex items-center gap-8">
+          <a href="/dashboard" className="text-xl font-bold">
+            <span className="text-amber">i</span>Flight
+          </a>
+
+          {user && (
+            <nav className="hidden sm:flex items-center gap-1">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+                    pathname === item.href
+                      ? "bg-amber/10 text-amber"
+                      : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          )}
+        </div>
 
         {user && (
           <div className="flex items-center gap-4">
-            <span className="text-gray-400 text-sm hidden sm:block">
+            <span className="text-gray-400 text-sm hidden md:block">
               {user.email}
             </span>
             <button

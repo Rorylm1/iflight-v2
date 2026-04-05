@@ -138,12 +138,46 @@ create policy "Users see own flights" on flights
 - No external SDKs — all via fetch API (lower bundle size)
 - Note: Public Gmail sync requires Google verification (weeks)
 
-**M5: Map & Stats**
-- CO2 emissions calculator and display
-- Stats dashboard with total/per-flight emissions
-- Mapbox world map
-- Flight path arcs (great circle)
-- Stats: km, countries, airlines, CO2 estimate
+**M5: Map & Carbon Impact** (expanded scope)
+
+New `/map` page — dedicated route visualization and carbon impact dashboard.
+
+*Navigation*
+- Add "Map & Stats" link to header
+- Accessible from dashboard via prominent CTA
+
+*Flight Map (Mapbox GL JS)*
+- World map with dark style matching app theme
+- Great circle arc paths between airports (curved lines showing actual flight paths)
+- Airport markers showing visit frequency
+- Route colors: amber gradient by recency or frequency
+- Interactive: hover for route details, click for flight info
+
+*Carbon Impact Dashboard — "Eco Insights"*
+- **AI-Generated Equivalents**: Use OpenAI to generate fresh, varied comparisons each view
+  - Prompt framework with guardrails (factual, relatable, mix of everyday/surprising)
+  - Examples: kettles boiled, Netflix hours, cheeseburgers, smartphone charges, train trips
+  - Rotate different equivalents to keep it engaging
+  - Fallback to static equivalents if API unavailable
+- **Infographic Visual Style**:
+  - Large icons/emojis with bold numbers
+  - Dark cards with amber accents, subtle glow effects
+  - Short punchy descriptions
+  - Responsive grid layout
+- **Offset Suggestions**:
+  - Trees needed to absorb (with visual tree grid)
+  - Estimated offset cost (e.g., "~£15 via certified programs")
+  - Brief explanation of offset types (reforestation, renewables, etc.)
+  - Optional: links to Gold Standard / Atmosfair / verified programs
+- **Breakdown Charts**:
+  - CO2 by haul type (short/medium/long)
+  - Emissions trend over time (if enough data)
+  - Per-flight average
+
+*Technical Notes*
+- Cache AI-generated equivalents briefly (avoid API spam on refresh)
+- Reuse existing OpenAI setup from Gmail sync
+- Mapbox token stored in env vars (NEXT_PUBLIC_MAPBOX_TOKEN)
 
 **M6: Public Launch** (optional)
 - Custom domain
