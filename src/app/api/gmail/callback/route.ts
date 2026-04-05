@@ -15,11 +15,16 @@ export const dynamic = "force-dynamic";
  * Exchanges authorization code for tokens and stores them.
  */
 export async function GET(request: Request) {
+  console.log("[Gmail Callback] Received callback request");
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get("code");
     const state = searchParams.get("state");
     const error = searchParams.get("error");
+
+    console.log("[Gmail Callback] Has code:", !!code);
+    console.log("[Gmail Callback] Has state:", !!state);
+    console.log("[Gmail Callback] Error param:", error);
 
     // Handle user denial or error
     if (error) {

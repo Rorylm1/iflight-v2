@@ -70,6 +70,11 @@ export async function exchangeCodeForTokens(code: string): Promise<GoogleTokens>
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI || getDefaultRedirectUri();
 
+  console.log("[Google OAuth] Exchanging code for tokens...");
+  console.log("[Google OAuth] Client ID present:", !!clientId);
+  console.log("[Google OAuth] Client Secret present:", !!clientSecret);
+  console.log("[Google OAuth] Redirect URI:", redirectUri);
+
   if (!clientId || !clientSecret) {
     throw new Error("Google OAuth credentials not configured");
   }
@@ -89,12 +94,14 @@ export async function exchangeCodeForTokens(code: string): Promise<GoogleTokens>
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    console.error("[Google OAuth] Token exchange failed:", error);
+    const errorText = await response.text();
+    console.error("[Google OAuth] Token exchange failed with status:", response.status);
+    console.error("[Google OAuth] Error response:", errorText);
     throw new Error("Failed to exchange authorization code for tokens");
   }
 
   const tokens: GoogleTokens = await response.json();
+  console.log("[Google OAuth] Token exchange successful, has refresh_token:", !!tokens.refresh_token);
   return tokens;
 }
 
@@ -231,18 +238,29 @@ export function verifyState(state: string): string | null {
  * Get default redirect URI based on environment
  */
 function getDefaultRedirectUri(): string {
-  // Use explicit production URL if set, otherwise fall back to Vercel URL
-  // IMPORTANT: VERCEL_URL changes per deployment, so we prefer a stable URL
+  // Use explicit redirect URI if set (recommended for production)
+  if (process.env.GOOGLE_REDIRECT_URI) {
+    console.log("[Google OAuth] Using explicit GOOGLE_REDIRECT_URI");
+    return process.env.GOOGLE_REDIRECT_URI;
+  }
+  // Use explicit production URL if set
   if (process.env.NEXT_PUBLIC_APP_URL) {
-    return `${process.env.NEXT_PUBLIC_APP_URL}/api/gmail/callback`;
+    const uri = `${process.env.NEXT_PUBLIC_APP_URL}/api/gmail/callback`;
+    console.log("[Google OAuth] Using NEXT_PUBLIC_APP_URL redirect:", uri);
+    return uri;
   }
   // For production on Vercel, use the production domain (not preview URLs)
   if (process.env.VERCEL_ENV === "production") {
-    return "https://iflight-v2.vercel.app/api/gmail/callback";
+    const uri = "https://iflight-v2.vercel.app/api/gmail/callback";
+    console.log("[Google OAuth] Using hardcoded production redirect:", uri);
+    return uri;
   }
   // For preview deployments
   if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}/api/gmail/callback`;
+    const uri = `https://${process.env.VERCEL_URL}/api/gmail/callback`;
+    console.log("[Google OAuth] Using VERCEL_URL redirect:", uri);
+    return uri;
   }
+  console.log("[Google OAuth] Using localhost redirect");
   return "http://localhost:3000/api/gmail/callback";
 }
