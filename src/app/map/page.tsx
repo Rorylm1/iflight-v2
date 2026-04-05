@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import CarbonInsights from "@/components/CarbonInsights";
@@ -23,25 +24,39 @@ export default function MapPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Get user from Supabase client
         const supabase = createClient();
-        const { data: { user: authUser } } = await supabase.auth.getUser();
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !authUser) {
+          // Redirect to login if not authenticated
+          router.push("/auth/signin");
+          return;
+        }
+
         setUser(authUser);
 
         // Fetch flights from API
         const response = await fetch("/api/flights");
-        const data = await response.json();
 
         if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          if (response.status === 401) {
+            router.push("/auth/signin");
+            return;
+          }
           throw new Error(data.error || "Failed to fetch flights");
         }
 
+        const data = await response.json();
         setFlights(data.flights || []);
       } catch (err) {
+        console.error("Error loading map data:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setIsLoading(false);
@@ -49,7 +64,7 @@ export default function MapPage() {
     };
 
     fetchData();
-  }, []);
+  }, [router]);
 
   if (isLoading) {
     return (
@@ -69,8 +84,14 @@ export default function MapPage() {
       <div className="min-h-screen">
         <Header user={user} />
         <main className="max-w-6xl mx-auto px-4 py-8">
-          <div className="p-4 bg-red-900/50 border border-red-700 rounded text-red-200">
-            {error}
+          <div className="p-6 bg-red-900/50 border border-red-700 rounded-lg text-center">
+            <p className="text-red-200 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         </main>
       </div>
