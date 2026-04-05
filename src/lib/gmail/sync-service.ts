@@ -70,13 +70,22 @@ export async function getValidAccessToken(
 
   // Check if token is expired
   const expiresAt = new Date(connection.token_expires_at);
+  const now = new Date();
+  const expired = isTokenExpired(expiresAt);
 
-  if (!isTokenExpired(expiresAt)) {
+  console.log("[Sync] Token check - expires_at from DB:", connection.token_expires_at);
+  console.log("[Sync] Token check - parsed expiresAt:", expiresAt.toISOString());
+  console.log("[Sync] Token check - current time:", now.toISOString());
+  console.log("[Sync] Token check - isExpired:", expired);
+  console.log("[Sync] Token check - time until expiry (ms):", expiresAt.getTime() - now.getTime());
+
+  if (!expired) {
+    console.log("[Sync] Token is still valid, using existing access_token");
     return connection.access_token;
   }
 
   // Refresh the token
-  console.log("[Sync] Refreshing expired access token");
+  console.log("[Sync] Token expired, attempting refresh...");
   const newTokens = await refreshAccessToken(connection.refresh_token);
 
   // Update in database
