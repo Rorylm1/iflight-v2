@@ -108,6 +108,11 @@ export async function refreshAccessToken(refreshToken: string): Promise<GoogleTo
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
+  console.log("[Google OAuth] Attempting token refresh...");
+  console.log("[Google OAuth] Client ID present:", !!clientId);
+  console.log("[Google OAuth] Client Secret present:", !!clientSecret);
+  console.log("[Google OAuth] Refresh token length:", refreshToken?.length || 0);
+
   if (!clientId || !clientSecret) {
     throw new Error("Google OAuth credentials not configured");
   }
@@ -126,12 +131,27 @@ export async function refreshAccessToken(refreshToken: string): Promise<GoogleTo
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    console.error("[Google OAuth] Token refresh failed:", error);
-    throw new Error("Failed to refresh access token");
+    const errorText = await response.text();
+    console.error("[Google OAuth] Token refresh failed with status:", response.status);
+    console.error("[Google OAuth] Error response:", errorText);
+
+    // Parse Google's error response for more detail
+    try {
+      const errorJson = JSON.parse(errorText);
+      if (errorJson.error === "invalid_grant") {
+        throw new Error("Gmail connection expired. Please disconnect and reconnect Gmail.");
+      }
+      throw new Error(`Token refresh failed: ${errorJson.error_description || errorJson.error}`);
+    } catch (parseError) {
+      if (parseError instanceof Error && parseError.message.includes("Gmail connection")) {
+        throw parseError;
+      }
+      throw new Error("Failed to refresh access token");
+    }
   }
 
   const tokens: GoogleTokens = await response.json();
+  console.log("[Google OAuth] Token refresh successful");
   return tokens;
 }
 
