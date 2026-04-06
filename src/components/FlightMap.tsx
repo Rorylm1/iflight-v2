@@ -80,10 +80,31 @@ export default function FlightMap({ flights }: FlightMapProps) {
       return;
     }
 
+    // Check container dimensions before initializing
+    const rect = mapContainer.current.getBoundingClientRect();
+    console.log("[FlightMap] Container dimensions:", rect.width, "x", rect.height);
+
+    if (rect.width === 0 || rect.height === 0) {
+      console.warn("[FlightMap] Container has zero dimensions, waiting...");
+      // Retry after a short delay if dimensions are 0
+      const retryTimeout = setTimeout(() => {
+        map.current = null; // Reset so useEffect can retry
+      }, 100);
+      return () => clearTimeout(retryTimeout);
+    }
+
+    // Check WebGL support
+    if (!mapboxgl.supported()) {
+      console.error("[FlightMap] WebGL not supported");
+      setMapError("WebGL is not supported in your browser. Please try a different browser.");
+      return;
+    }
+    console.log("[FlightMap] WebGL supported:", mapboxgl.supported());
+
     mapboxgl.accessToken = token;
 
     try {
-      console.log("[FlightMap] Creating map...");
+      console.log("[FlightMap] Creating map with dimensions:", rect.width, "x", rect.height);
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/dark-v11",
