@@ -60,41 +60,57 @@ export default function FlightMap({ flights }: FlightMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+    console.log("[FlightMap] Token present:", !!token);
+    console.log("[FlightMap] Token starts with:", token?.substring(0, 10));
+
     if (!token) {
-      console.error("Mapbox token not found");
+      console.error("[FlightMap] Mapbox token not found in env");
       return;
     }
 
     mapboxgl.accessToken = token;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/dark-v11",
-      center: [0, 30],
-      zoom: 1.5,
-      projection: "globe",
-    });
-
-    map.current.on("load", () => {
-      setIsLoaded(true);
-
-      // Add atmosphere effect for globe view
-      map.current?.setFog({
-        color: "rgb(13, 13, 13)",
-        "high-color": "rgb(26, 26, 26)",
-        "horizon-blend": 0.02,
-        "space-color": "rgb(13, 13, 13)",
-        "star-intensity": 0.3,
+    try {
+      console.log("[FlightMap] Creating map...");
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: [0, 30],
+        zoom: 1.5,
+        projection: "globe",
       });
-    });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+      map.current.on("load", () => {
+        console.log("[FlightMap] Map loaded successfully");
+        setIsLoaded(true);
+
+        // Add atmosphere effect for globe view
+        map.current?.setFog({
+          color: "rgb(13, 13, 13)",
+          "high-color": "rgb(26, 26, 26)",
+          "horizon-blend": 0.02,
+          "space-color": "rgb(13, 13, 13)",
+          "star-intensity": 0.3,
+        });
+      });
+
+      map.current.on("error", (e) => {
+        console.error("[FlightMap] Map error:", e);
+        setMapError(e.error?.message || "Map failed to load");
+      });
+
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+    } catch (err) {
+      console.error("[FlightMap] Failed to create map:", err);
+      setMapError(err instanceof Error ? err.message : "Failed to initialize map");
+    }
 
     return () => {
       map.current?.remove();
@@ -331,6 +347,15 @@ export default function FlightMap({ flights }: FlightMapProps) {
           <div className="text-center">
             <div className="text-4xl mb-2">✈️</div>
             <p className="text-gray-400">Add flights to see your routes on the map</p>
+          </div>
+        </div>
+      )}
+      {mapError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90">
+          <div className="text-center p-6">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-red-400 font-semibold mb-2">Map Error</p>
+            <p className="text-gray-400 text-sm">{mapError}</p>
           </div>
         </div>
       )}
