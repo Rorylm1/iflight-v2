@@ -78,3 +78,20 @@ body {
 .mapboxgl-ctrl button .mapboxgl-ctrl-icon {
   filter: invert(1);
 }
+
+/* Ensure map canvas is visible */
+.mapboxgl-map {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mapboxgl-canvas {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}

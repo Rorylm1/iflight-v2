@@ -94,7 +94,11 @@ export default function FlightMap({ flights }: FlightMapProps) {
 
       map.current.on("load", () => {
         console.log("[FlightMap] Map loaded successfully");
-        setIsLoaded(true);
+
+        // Force resize to ensure proper rendering
+        map.current?.resize();
+        console.log("[FlightMap] Map resized, canvas size:",
+          map.current?.getCanvas().width, "x", map.current?.getCanvas().height);
 
         // Add atmosphere effect for globe view
         map.current?.setFog({
@@ -104,6 +108,18 @@ export default function FlightMap({ flights }: FlightMapProps) {
           "space-color": "rgb(13, 13, 13)",
           "star-intensity": 0.3,
         });
+
+        setIsLoaded(true);
+      });
+
+      map.current.on("style.load", () => {
+        console.log("[FlightMap] Style loaded");
+      });
+
+      map.current.on("render", () => {
+        // Only log once
+        if (!map.current?.loaded()) return;
+        console.log("[FlightMap] First render complete");
       });
 
       map.current.on("error", (e) => {
@@ -126,7 +142,10 @@ export default function FlightMap({ flights }: FlightMapProps) {
 
   // Add flight routes and airport markers when map is loaded and flights change
   useEffect(() => {
+    console.log("[FlightMap] Route useEffect - isLoaded:", isLoaded, "flights:", flights.length);
     if (!map.current || !isLoaded) return;
+
+    console.log("[FlightMap] Adding routes for", flights.length, "flights");
 
     // Remove existing layers and sources
     const existingLayers = ["flight-routes", "airport-points", "airport-labels"];
@@ -146,12 +165,17 @@ export default function FlightMap({ flights }: FlightMapProps) {
     // Build route features from flights
     const routeFeatures: GeoJSON.Feature[] = [];
     const airportCounts: Record<string, number> = {};
+    let skippedFlights = 0;
 
     flights.forEach((flight) => {
       const depAirport = AIRPORTS[flight.departure_airport];
       const arrAirport = AIRPORTS[flight.arrival_airport];
 
-      if (!depAirport || !arrAirport) return;
+      if (!depAirport || !arrAirport) {
+        console.warn("[FlightMap] Missing airport data for:", flight.departure_airport, "->", flight.arrival_airport);
+        skippedFlights++;
+        return;
+      }
 
       // Count airport visits
       airportCounts[flight.departure_airport] =
@@ -198,6 +222,8 @@ export default function FlightMap({ flights }: FlightMapProps) {
         };
       }
     );
+
+    console.log("[FlightMap] Built", routeFeatures.length, "routes,", Object.keys(airportCounts).length, "airports, skipped:", skippedFlights);
 
     // Add routes source and layer
     if (routeFeatures.length > 0) {
@@ -342,7 +368,11 @@ export default function FlightMap({ flights }: FlightMapProps) {
 
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-800">
-      <div ref={mapContainer} className="absolute inset-0" />
+      <div
+        ref={mapContainer}
+        className="absolute inset-0 w-full h-full"
+        style={{ minHeight: '500px' }}
+      />
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-amber border-t-transparent"></div>
