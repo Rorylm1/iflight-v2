@@ -120,16 +120,26 @@ export const FLIGHT_KEYWORDS = [
 export const SUBJECT_PATTERNS = [
   "flight confirmation",
   "booking confirmed",
+  "booking confirmation",
   "your flight",
   "e-ticket",
   "itinerary",
   "boarding pass",
   "check-in reminder",
   "trip confirmation",
+  "confirmation", // Broader - catches "Your confirmation", "Booking confirmation", etc.
+  "your booking",
+  "travel itinerary",
+  "flight details",
+  "ready to fly",
 ];
 
 /**
- * Build Gmail search query for flight booking emails
+ * Build Gmail search query for flight booking emails (DEEP SYNC)
+ *
+ * This is the broadest search - finds any email that might contain flight info:
+ * 1. Any email from known airline domains
+ * 2. Any email with flight-related keywords in subject OR body
  *
  * @param lookbackDays - Number of days to look back
  * @returns Gmail search query string
@@ -140,15 +150,48 @@ export function buildGmailQuery(lookbackDays: number = 365): string {
   afterDate.setDate(afterDate.getDate() - lookbackDays);
   const afterStr = afterDate.toISOString().split("T")[0].replace(/-/g, "/");
 
-  // Build sender query (OR all known senders)
-  const senderQuery = AIRLINE_SENDERS.map((s) => `from:${s}`).join(" OR ");
+  // Top airline senders (most common - keeps query shorter)
+  const topAirlines = [
+    "easyjet.com",
+    "ryanair.com",
+    "britishairways.com",
+    "jet2.com",
+    "vueling.com",
+    "wizzair.com",
+    "emirates.com",
+    "united.com",
+    "delta.com",
+    "aa.com",
+    "southwest.com",
+    "lufthansa.com",
+    "airfrance.fr",
+    "klm.com",
+  ];
+  const senderQuery = topAirlines.map((s) => `from:${s}`).join(" OR ");
 
-  // Build keyword query (OR all keywords)
-  const keywordQuery = FLIGHT_KEYWORDS.map((k) => `subject:"${k}"`).join(" OR ");
+  // Broad keyword search (searches body AND subject)
+  // These words appear in almost every flight booking email
+  const bodyKeywords = [
+    "flight",
+    "booking reference",
+    "confirmation code",
+    "e-ticket",
+    "departure",
+    "boarding",
+  ];
+  const keywordQuery = bodyKeywords.map((k) => `"${k}"`).join(" OR ");
 
-  // Combine with hybrid approach:
-  // (known senders) OR (keywords) - excluding promotions/social
-  const query = `(${senderQuery}) OR (${keywordQuery}) after:${afterStr} -category:promotions -category:social`;
+  // Subject-specific patterns
+  const subjectQuery = [
+    'subject:"confirmation"',
+    'subject:"booking"',
+    'subject:"itinerary"',
+    'subject:"flight"',
+    'subject:"e-ticket"',
+  ].join(" OR ");
+
+  // Combine: (from airlines) OR (keywords in body) OR (keywords in subject)
+  const query = `((${senderQuery}) OR (${keywordQuery}) OR (${subjectQuery})) after:${afterStr} -category:promotions -category:social -category:updates`;
 
   return query;
 }
@@ -183,20 +226,28 @@ export function buildSimpleQuery(lookbackDays: number = 365): string {
 }
 
 /**
- * Build the smartest possible query - subject-line focused
+ * Build the smartest possible query - subject-line focused (QUICK SYNC)
  *
- * This is the most aggressive filter:
- * - Searches ONLY in subject lines (way faster than body search)
- * - Requires flight-related subject patterns
- * - Best for users with lots of emails
+ * Balanced approach:
+ * - Searches subject lines for booking-related terms
+ * - Includes "confirmation" which catches most booking emails
+ * - Fast but comprehensive
  */
 export function buildSmartQuery(lookbackDays: number = 365): string {
   const afterDate = new Date();
   afterDate.setDate(afterDate.getDate() - lookbackDays);
   const afterStr = afterDate.toISOString().split("T")[0].replace(/-/g, "/");
 
-  // Subject line patterns that almost always indicate a flight booking
-  const subjectPatterns = SUBJECT_PATTERNS.map((p) => `subject:"${p}"`).join(" OR ");
+  // Subject patterns - "confirmation" alone catches a lot
+  const subjectPatterns = [
+    'subject:"flight"',
+    'subject:"booking confirmation"',
+    'subject:"your booking"',
+    'subject:"e-ticket"',
+    'subject:"itinerary"',
+    'subject:"boarding pass"',
+    'subject:"check-in"',
+  ].join(" OR ");
 
   return `(${subjectPatterns}) after:${afterStr} -category:promotions -category:social`;
 }
