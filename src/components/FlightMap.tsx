@@ -1,10 +1,14 @@
 "use client";
 
+console.log("[FlightMap] Module loading...");
+
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Flight } from "./FlightCard";
 import { AIRPORTS } from "@/lib/airports";
+
+console.log("[FlightMap] Module loaded, mapboxgl version:", mapboxgl.version);
 
 interface FlightMapProps {
   flights: Flight[];
@@ -57,6 +61,8 @@ function generateGreatCircleArc(
 }
 
 export default function FlightMap({ flights }: FlightMapProps) {
+  console.log("[FlightMap] Component rendering, flights:", flights.length);
+
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
