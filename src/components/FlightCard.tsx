@@ -41,6 +41,26 @@ const STATUS_STYLES: Record<string, { dot: string; text: string }> = {
   delayed: { dot: "bg-amber", text: "text-amber" },
 };
 
+/**
+ * Get effective status based on date
+ * If flight date is in the past and status is "scheduled", show as "landed"
+ */
+function getEffectiveStatus(status: string, date: string): string {
+  // If explicitly cancelled, keep it
+  if (status === "cancelled") return status;
+
+  // Check if flight date is in the past
+  const flightDate = new Date(date + "T23:59:59"); // End of flight day
+  const now = new Date();
+
+  if (flightDate < now) {
+    // Flight is in the past - show as landed unless cancelled
+    return "landed";
+  }
+
+  return status;
+}
+
 function formatTime(isoString: string): string {
   const date = new Date(isoString);
   return date.toLocaleTimeString("en-US", {
@@ -97,7 +117,9 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
     }
   };
 
-  const statusStyle = STATUS_STYLES[flight.status] || STATUS_STYLES.scheduled;
+  // Compute effective status (past flights show as "landed")
+  const effectiveStatus = getEffectiveStatus(flight.status, flight.date);
+  const statusStyle = STATUS_STYLES[effectiveStatus] || STATUS_STYLES.scheduled;
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gray-700 transition-colors">
@@ -123,7 +145,7 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
             <span className={`text-sm capitalize ${statusStyle.text}`}>
-              {flight.status}
+              {effectiveStatus}
             </span>
           </div>
         </div>
@@ -187,9 +209,9 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
                 {flight.departure_airport_name || flight.departure_airport}
               </div>
               {flight.departure_time_actual && (
-                (flight.status === "landed" || flight.status === "active" || flight.departure_time_actual !== flight.departure_time) && (
+                (effectiveStatus === "landed" || effectiveStatus === "active" || flight.departure_time_actual !== flight.departure_time) && (
                   <div className="text-amber text-xs mt-1">
-                    {flight.status === "landed" || flight.status === "active" ? "Departed" : "Revised"}: {formatTime(flight.departure_time_actual)}
+                    {effectiveStatus === "landed" || effectiveStatus === "active" ? "Departed" : "Revised"}: {formatTime(flight.departure_time_actual)}
                   </div>
                 )
               )}
@@ -203,9 +225,9 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
                 {flight.arrival_airport_name || flight.arrival_airport}
               </div>
               {flight.arrival_time_actual && (
-                (flight.status === "landed" || flight.arrival_time_actual !== flight.arrival_time) && (
+                (effectiveStatus === "landed" || flight.arrival_time_actual !== flight.arrival_time) && (
                   <div className="text-green-400 text-xs mt-1">
-                    {flight.status === "landed" ? "Landed" : "Expected"}: {formatTime(flight.arrival_time_actual)}
+                    {effectiveStatus === "landed" ? "Landed" : "Expected"}: {formatTime(flight.arrival_time_actual)}
                   </div>
                 )
               )}

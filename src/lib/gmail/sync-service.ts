@@ -16,13 +16,14 @@ import {
   isTokenExpired,
 } from "./google-oauth";
 import { searchEmails, fetchEmailContents, EmailContent } from "./gmail-api";
-import { buildSmartQuery } from "./airline-senders";
+import { buildSmartQuery, buildGmailQuery } from "./airline-senders";
 import { parseFlightEmail, ParseResult, ParsedFlight } from "./email-parser";
 import { getFlightFromApi } from "../flight-api";
 
 export interface SyncOptions {
   lookbackDays?: number; // Default: 365 (12 months)
   maxEmails?: number; // Default: 100
+  deepSync?: boolean; // Use broader search query (slower but finds more)
 }
 
 export interface SyncProgress {
@@ -300,8 +301,12 @@ export async function runGmailSync(
       total: 0,
     });
 
-    const query = buildSmartQuery(lookbackDays);
+    // Use broader query for deep sync, smart query for quick sync
+    const query = options.deepSync
+      ? buildGmailQuery(lookbackDays)
+      : buildSmartQuery(lookbackDays);
     console.log("[Sync] Gmail query:", query);
+    console.log("[Sync] Deep sync:", !!options.deepSync);
     console.log("[Sync] Max emails to process:", effectiveMaxEmails);
 
     const searchResult = await searchEmails(accessToken, query, effectiveMaxEmails);

@@ -301,6 +301,23 @@ export default function FlightMap({ flights }: FlightMapProps) {
     }
   }, [flights, isLoaded]);
 
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+  // Show error if token is missing
+  if (!token) {
+    return (
+      <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-800 bg-gray-900 flex items-center justify-center">
+        <div className="text-center p-6">
+          <div className="text-4xl mb-4">🗺️</div>
+          <p className="text-red-400 font-semibold mb-2">Mapbox token not configured</p>
+          <p className="text-gray-500 text-sm">
+            Add NEXT_PUBLIC_MAPBOX_TOKEN to environment variables
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-800">
       <div ref={mapContainer} className="absolute inset-0" />

@@ -27,8 +27,10 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
   const [syncing, setSyncing] = useState(false);
   const [result, setResult] = useState<SyncResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showOptions, setShowOptions] = useState(false);
 
-  const handleSync = async () => {
+  const handleSync = async (deepSync: boolean = false) => {
+    setShowOptions(false);
     setSyncing(true);
     setResult(null);
     setError(null);
@@ -41,7 +43,8 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
         },
         body: JSON.stringify({
           lookbackDays: 365, // 12 months
-          maxEmails: 20, // Reduced to avoid timeouts
+          maxEmails: deepSync ? 50 : 20, // More emails for deep sync
+          deepSync: deepSync, // Use broader search query
         }),
       });
 
@@ -86,54 +89,91 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
 
   return (
     <div className="space-y-4">
-      {/* Sync Button */}
-      <button
-        onClick={handleSync}
-        disabled={syncing}
-        className="flex items-center gap-2 px-4 py-2 bg-amber text-black font-semibold rounded hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {syncing ? (
-          <>
-            <svg
-              className="w-5 h-5 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
+      {/* Sync Button with Dropdown */}
+      <div className="relative inline-flex">
+        <button
+          onClick={() => handleSync(false)}
+          disabled={syncing}
+          className="flex items-center gap-2 px-4 py-2 bg-amber text-black font-semibold rounded-l hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {syncing ? (
+            <>
+              <svg
+                className="w-5 h-5 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              Syncing...
+            </>
+          ) : (
+            <>
+              <svg
+                className="w-5 h-5"
+                fill="none"
                 stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-            Syncing...
-          </>
-        ) : (
-          <>
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              Sync Flights from Gmail
+            </>
+          )}
+        </button>
+
+        {/* Dropdown toggle */}
+        <button
+          onClick={() => setShowOptions(!showOptions)}
+          disabled={syncing}
+          className="px-2 py-2 bg-amber text-black font-semibold rounded-r border-l border-amber-600 hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {/* Dropdown menu */}
+        {showOptions && !syncing && (
+          <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded shadow-lg z-10 min-w-[200px]">
+            <button
+              onClick={() => handleSync(false)}
+              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            Sync Flights from Gmail
-          </>
+              <div className="font-semibold text-white">Quick Sync</div>
+              <div className="text-xs text-gray-400">
+                Searches subject lines only (fast)
+              </div>
+            </button>
+            <button
+              onClick={() => handleSync(true)}
+              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors border-t border-gray-700"
+            >
+              <div className="font-semibold text-white">Deep Sync</div>
+              <div className="text-xs text-gray-400">
+                Searches all airline emails (thorough)
+              </div>
+            </button>
+          </div>
         )}
-      </button>
+      </div>
 
       {/* Error Message */}
       {error && (
