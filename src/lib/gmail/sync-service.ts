@@ -16,7 +16,7 @@ import {
   isTokenExpired,
 } from "./google-oauth";
 import { searchEmails, fetchEmailContents, EmailContent } from "./gmail-api";
-import { buildSimpleQuery } from "./airline-senders";
+import { buildSmartQuery } from "./airline-senders";
 import { parseFlightEmail, ParseResult, ParsedFlight } from "./email-parser";
 import { getFlightFromApi } from "../flight-api";
 
@@ -300,7 +300,7 @@ export async function runGmailSync(
       total: 0,
     });
 
-    const query = buildSimpleQuery(lookbackDays);
+    const query = buildSmartQuery(lookbackDays);
     console.log("[Sync] Gmail query:", query);
     console.log("[Sync] Max emails to process:", effectiveMaxEmails);
 

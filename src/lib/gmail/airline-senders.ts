@@ -116,6 +116,18 @@ export const FLIGHT_KEYWORDS = [
   "boarding pass",
 ];
 
+// High-confidence subject line patterns (most booking emails have these in subject)
+export const SUBJECT_PATTERNS = [
+  "flight confirmation",
+  "booking confirmed",
+  "your flight",
+  "e-ticket",
+  "itinerary",
+  "boarding pass",
+  "check-in reminder",
+  "trip confirmation",
+];
+
 /**
  * Build Gmail search query for flight booking emails
  *
@@ -142,17 +154,49 @@ export function buildGmailQuery(lookbackDays: number = 365): string {
 }
 
 /**
- * Build a simpler query for testing (fewer senders)
+ * Build an optimized query that requires "flight" keyword
+ *
+ * Strategy: Email must contain "flight" AND one of our booking indicators
+ * This dramatically reduces false positives and speeds up sync
  */
 export function buildSimpleQuery(lookbackDays: number = 365): string {
   const afterDate = new Date();
   afterDate.setDate(afterDate.getDate() - lookbackDays);
   const afterStr = afterDate.toISOString().split("T")[0].replace(/-/g, "/");
 
-  // Just use keywords for a simpler query
-  const keywordQuery = FLIGHT_KEYWORDS.slice(0, 5)
-    .map((k) => `"${k}"`)
-    .join(" OR ");
+  // Booking indicators (must have "flight" + one of these)
+  const bookingIndicators = [
+    "confirmation",
+    "booking",
+    "e-ticket",
+    "itinerary",
+    "reservation",
+    "check-in",
+    "boarding",
+  ];
 
-  return `(${keywordQuery}) after:${afterStr} -category:promotions`;
+  // Build query: must contain "flight" AND one booking indicator
+  // Gmail query: flight AND (confirmation OR booking OR e-ticket...)
+  const indicatorQuery = bookingIndicators.map((k) => `"${k}"`).join(" OR ");
+
+  return `flight (${indicatorQuery}) after:${afterStr} -category:promotions -category:social -category:updates`;
+}
+
+/**
+ * Build the smartest possible query - subject-line focused
+ *
+ * This is the most aggressive filter:
+ * - Searches ONLY in subject lines (way faster than body search)
+ * - Requires flight-related subject patterns
+ * - Best for users with lots of emails
+ */
+export function buildSmartQuery(lookbackDays: number = 365): string {
+  const afterDate = new Date();
+  afterDate.setDate(afterDate.getDate() - lookbackDays);
+  const afterStr = afterDate.toISOString().split("T")[0].replace(/-/g, "/");
+
+  // Subject line patterns that almost always indicate a flight booking
+  const subjectPatterns = SUBJECT_PATTERNS.map((p) => `subject:"${p}"`).join(" OR ");
+
+  return `(${subjectPatterns}) after:${afterStr} -category:promotions -category:social`;
 }
