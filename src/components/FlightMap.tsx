@@ -127,6 +127,22 @@ export default function FlightMap({ flights }: FlightMapProps) {
         setMapError(e.error?.message || "Map failed to load");
       });
 
+      map.current.on("data", (e) => {
+        if (e.dataType === "source" && e.isSourceLoaded) {
+          console.log("[FlightMap] Source loaded:", e.sourceId);
+        }
+      });
+
+      map.current.on("idle", () => {
+        console.log("[FlightMap] Map idle - all tiles loaded");
+      });
+
+      map.current.on("sourcedata", (e) => {
+        if (e.sourceId === "composite" && e.isSourceLoaded) {
+          console.log("[FlightMap] Base map tiles loaded");
+        }
+      });
+
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
     } catch (err) {
