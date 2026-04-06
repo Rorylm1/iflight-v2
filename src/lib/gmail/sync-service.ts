@@ -260,13 +260,14 @@ export async function runGmailSync(
   options: SyncOptions = {},
   onProgress?: (progress: SyncProgress) => void
 ): Promise<SyncResult> {
-  // Cap emails to avoid Vercel timeout (hobby tier = 10s)
-  // Quick sync: 5 emails max (fast)
-  // Deep sync: 10 emails max (thorough but may timeout)
-  const MAX_EMAILS_QUICK = 5;
-  const MAX_EMAILS_DEEP = 10;
+  // Cap emails with time-aware processing for Vercel timeout
+  // Quick sync: 25 emails max (recent flights, fast keywords)
+  // Deep sync: 75 emails max (thorough search, may take longer)
+  // Time-aware processing will stop early if approaching timeout
+  const MAX_EMAILS_QUICK = 25;
+  const MAX_EMAILS_DEEP = 75;
   const maxLimit = options.deepSync ? MAX_EMAILS_DEEP : MAX_EMAILS_QUICK;
-  const { lookbackDays = 365, maxEmails = 20 } = options;
+  const { lookbackDays = 365, maxEmails = 50 } = options;
   const effectiveMaxEmails = Math.min(maxEmails, maxLimit);
 
   const syncStartTime = Date.now();

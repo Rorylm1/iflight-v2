@@ -187,6 +187,8 @@ export async function GET() {
     }
 
     // Fetch user's flights, ordered by date
+    console.log("[Flights] Fetching flights for user:", user.id, "email:", user.email);
+
     const { data: flights, error: fetchError } = await supabase
       .from("flights")
       .select("*")
@@ -194,13 +196,14 @@ export async function GET() {
       .order("date", { ascending: false });
 
     if (fetchError) {
-      console.error("Error fetching flights:", fetchError);
+      console.error("[Flights] Error fetching flights:", fetchError);
       return NextResponse.json(
         { error: "Failed to fetch flights" },
         { status: 500 }
       );
     }
 
+    console.log("[Flights] Found", flights?.length || 0, "flights for user");
     return NextResponse.json({ flights });
   } catch (error) {
     console.error("Error in GET /api/flights:", error);

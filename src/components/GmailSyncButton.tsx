@@ -42,8 +42,8 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          lookbackDays: 365, // 12 months
-          maxEmails: deepSync ? 50 : 20, // More emails for deep sync
+          lookbackDays: 365, // Full year of flight emails
+          maxEmails: deepSync ? 75 : 25, // More emails for thorough search
           deepSync: deepSync, // Use broader search query
         }),
       });
