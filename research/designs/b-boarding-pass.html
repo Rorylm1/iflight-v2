@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en" data-theme="manila">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>iFlight · Boarding Pass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Martian+Mono:wght@400;500;600&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DIRECTION B — "Boarding Pass"
+     Subject: a physical airline ticket. Each flight is one pass:
+     main section + perforated stub + barcode + dot-matrix data.
+     Signature: the tear-line with circular notch cut-outs and the
+     vertical barcode on the stub. Type pairs a characterful
+     grotesque (Bricolage) for the big IATA codes with a boxy mono
+     (Martian Mono) for printed ticket data.
+     ============================================================ */
+
+  :root[data-theme="manila"] {
+    --bg:       #d8d3c7;
+    --bg-2:     #cfc9bb;
+    --pass:     #f3efe6;   /* ticket stock */
+    --stub:     #e9e3d6;
+    --ink:      #1d1b16;
+    --ink-soft: #6a6557;
+    --accent:   #0e5a57;   /* airline teal */
+    --accent-2: #c8102e;   /* classic airline red */
+    --line:     #cdc6b6;
+    --barcode:  #1d1b16;
+    --shadow:   rgba(60,55,40,0.28);
+  }
+  :root[data-theme="redeye"] {
+    --bg:       #0d0f13;
+    --bg-2:     #0a0c10;
+    --pass:     #16191f;
+    --stub:     #1c2026;
+    --ink:      #eef1f5;
+    --ink-soft: #828a96;
+    --accent:   #ffb000;   /* amber — ties to iFlight */
+    --accent-2: #2e7df6;
+    --line:     #262b33;
+    --barcode:  #eef1f5;
+    --shadow:   rgba(0,0,0,0.55);
+  }
+  :root[data-theme="midcentury"] {
+    --bg:       #e7ddc8;
+    --bg-2:     #ded2b7;
+    --pass:     #f6f0e0;
+    --stub:     #efe6cf;
+    --ink:      #2a2118;
+    --ink-soft: #7c6a52;
+    --accent:   #1f3a5f;   /* TWA navy */
+    --accent-2: #d94e1f;   /* jet-age orange */
+    --line:     #d7c9aa;
+    --barcode:  #2a2118;
+    --shadow:   rgba(80,60,30,0.3);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: 'Sora', sans-serif;
+    background:
+      radial-gradient(140% 100% at 50% -20%, var(--bg), var(--bg-2)) ,
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(20px, 5vw, 64px) clamp(16px,4vw,40px) 100px;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  .masthead { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom: 26px; }
+  .brand {
+    font-family:'Bricolage Grotesque', sans-serif; font-weight:800;
+    font-size: clamp(28px, 5vw, 44px); letter-spacing:-0.02em; line-height:0.9;
+  }
+  .brand i { color: var(--accent); font-style: normal; }
+  .masthead p {
+    margin:0; font-family:'Martian Mono',monospace; font-size:11px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft); text-align:right;
+  }
+  .masthead__aside { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .replay {
+    border:1px solid var(--line); background:transparent; color:var(--ink-soft);
+    font-family:'Martian Mono',monospace; font-size:10px; letter-spacing:0.14em;
+    text-transform:uppercase; padding:7px 13px; border-radius:999px; cursor:pointer;
+    transition: border-color .18s ease, color .18s ease, transform .18s ease;
+  }
+  .replay:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .replay:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* ---- one boarding pass ---------------------------------------- */
+  .pass {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 196px;
+    background: var(--pass);
+    border-radius: 14px;
+    margin-bottom: 26px;
+    box-shadow: 0 18px 40px -18px var(--shadow), 0 2px 0 rgba(0,0,0,0.03);
+    isolation: isolate;
+  }
+  /* top accent rail */
+  .pass::before {
+    content:""; position:absolute; inset:0 0 auto 0; height:7px;
+    background: var(--accent);
+    border-radius: 14px 14px 0 0;
+  }
+  .pass[data-haul="long"]::before  { background: var(--accent-2); }
+
+  .pass__main { padding: 30px clamp(20px,3vw,34px) 26px; }
+
+  .route { display:flex; align-items:center; gap: clamp(14px,3vw,30px); }
+  .iata {
+    font-family:'Bricolage Grotesque',sans-serif; font-weight:800;
+    font-size: clamp(40px, 8vw, 66px); line-height:0.8; letter-spacing:-0.03em;
+  }
+  .iata small { display:block; font-family:'Sora'; font-weight:500; font-size:12px; letter-spacing:0.04em; color:var(--ink-soft); margin-top:8px; line-height:1.2; max-width:11ch; }
+  .leg { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--accent); }
+  .pass[data-haul="long"] .leg { color: var(--accent-2); }
+  .leg .plane { font-size: 20px; }
+  .leg .dashes { width:100%; height:2px; background: repeating-linear-gradient(90deg, currentColor 0 7px, transparent 7px 13px); opacity:0.7; }
+  .leg .km { font-family:'Martian Mono',monospace; font-size:11px; letter-spacing:0.08em; color:var(--ink-soft); }
+
+  .grid {
+    margin-top: 26px;
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: 18px 14px;
+  }
+  .fld .k { font-family:'Martian Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
+  .fld .v { font-family:'Martian Mono',monospace; font-size:14px; font-weight:500; letter-spacing:0.01em; }
+  .fld .v.big { font-size: 17px; }
+
+  /* ---- perforated stub ------------------------------------------ */
+  .pass__stub {
+    position: relative;
+    background: var(--stub);
+    border-radius: 0 14px 14px 0;
+    padding: 30px 22px 22px;
+    display:flex; flex-direction:column; gap: 16px;
+    border-left: 2px dashed var(--line);
+  }
+  /* notch cut-outs that sell the "tear here" perforation */
+  .pass__stub::before, .pass__stub::after {
+    content:""; position:absolute; left:-11px; width:22px; height:22px;
+    border-radius:50%; background: var(--bg);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  .pass__stub::before { top:-11px; }
+  .pass__stub::after  { bottom:-11px; }
+
+  .stub-row .k { font-family:'Martian Mono',monospace; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-soft); }
+  .stub-row .v { font-family:'Bricolage Grotesque',sans-serif; font-weight:800; font-size:24px; line-height:1; margin-top:4px; }
+
+  .status {
+    align-self:flex-start; font-family:'Martian Mono',monospace; font-size:10px;
+    letter-spacing:0.14em; text-transform:uppercase; padding:5px 10px; border-radius:999px;
+  }
+  .status.boarding { background: var(--accent); color:#fff; }
+  .status.landed   { background: transparent; color:var(--ink-soft); border:1px solid var(--line); }
+  .status.scheduled{ background: var(--accent-2); color:#fff; }
+
+  .barcode { margin-top:auto; height: 46px; display:flex; align-items:flex-end; gap:2px; opacity:0.9; }
+  .barcode i { display:block; width:2px; background: var(--barcode); height:100%; }
+  .pnr { font-family:'Martian Mono',monospace; font-size:10px; letter-spacing:0.3em; color:var(--ink-soft); text-align:center; }
+
+  /* ---- theme switch + tag --------------------------------------- */
+  .switch {
+    position: fixed; left:50%; bottom:18px; transform:translateX(-50%);
+    display:flex; gap:6px; padding:7px; border-radius:999px; z-index:50;
+    background: color-mix(in srgb, var(--pass) 88%, transparent);
+    border:1px solid var(--line); backdrop-filter: blur(8px);
+    box-shadow: 0 8px 24px -8px var(--shadow);
+  }
+  .switch button {
+    border:0; cursor:pointer; padding:8px 15px; border-radius:999px;
+    background:transparent; color:var(--ink-soft); font-family:'Martian Mono',monospace;
+    font-size:10px; letter-spacing:0.12em; text-transform:uppercase; transition:all .18s ease;
+  }
+  .switch button[aria-pressed="true"] { background: var(--accent); color:#fff; }
+  .switch button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .tag { position:fixed; top:14px; left:16px; z-index:50; font-family:'Martian Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft); }
+  .tag b { color: var(--accent); }
+
+  /* ---- entrance: Apple-Wallet slide-up + perforation paper-fold ----
+     The pass slides up and settles flat (a touch of rotateX from the
+     top edge); the stub then UNFOLDS open along the perforation
+     (rotateY pivoting on the dashed tear-line). fill-mode:backwards
+     shows the folded state during each card's stagger delay, then
+     reverts to the resting style so the hover-lift can take over.   */
+  #passes { perspective: 1500px; perspective-origin: 50% -8%; }
+
+  .pass {
+    transform-origin: 50% 0;
+    will-change: transform, opacity;
+    animation: wallet-in 0.62s cubic-bezier(0.18,0.86,0.24,1) backwards;
+    transition: transform .26s cubic-bezier(0.2,0.7,0.3,1), box-shadow .26s ease;
+  }
+  .pass:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 28px 56px -22px var(--shadow), 0 3px 0 rgba(0,0,0,0.04);
+  }
+  @keyframes wallet-in {
+    from { opacity: 0; transform: translateY(48px) scale(0.955) rotateX(6deg); }
+    62%  { opacity: 1; }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .pass__stub {
+    transform-origin: left center;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+    animation: stub-unfold 0.5s cubic-bezier(0.18,0.86,0.24,1) backwards;
+  }
+  @keyframes stub-unfold {
+    from { transform: perspective(1000px) rotateY(-78deg); opacity: 0; }
+    40%  { opacity: 1; }
+    to   { transform: perspective(1000px) rotateY(0deg); opacity: 1; }
+  }
+
+  @media (max-width: 680px) {
+    .pass { grid-template-columns: 1fr; }
+    .pass__stub { border-left:0; border-top:2px dashed var(--line); border-radius:0 0 14px 14px; flex-direction:row; flex-wrap:wrap; align-items:center; }
+    .pass__stub::before { top:auto; bottom:-11px; left:-11px; }
+    .pass__stub::after  { bottom:-11px; left:auto; right:-11px; }
+    .grid { grid-template-columns: repeat(2,1fr); }
+    .barcode { width:100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pass, .pass__stub { animation: none !important; opacity: 1; }
+    .pass { transform: none; }
+    .pass:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="tag">iFlight · direction <b>B — boarding pass</b></div>
+
+  <div class="wrap">
+    <div class="masthead">
+      <div class="brand"><i>i</i>Flight</div>
+      <div class="masthead__aside">
+        <p>Boarding passes · 2026<br>7 sectors flown</p>
+        <button id="replay" class="replay" type="button" aria-label="Replay entrance animation">⟳ Replay</button>
+      </div>
+    </div>
+    <div id="passes"></div>
+  </div>
+
+  <nav class="switch" aria-label="Theme">
+    <button data-theme="manila"     aria-pressed="true">Manila ticket</button>
+    <button data-theme="redeye"     aria-pressed="false">Red-eye dark</button>
+    <button data-theme="midcentury" aria-pressed="false">Mid-century</button>
+  </nav>
+
+<script>
+  const FLIGHTS = [
+    { from:"LHR", fromCity:"London Heathrow", to:"JFK", toCity:"New York", carrier:"British Airways", no:"BA 117",
+      date:"21 JUN 2026", dep:"14:30", arr:"17:25", aircraft:"B777", km:"5,541", co2:"1.9 t", seat:"14C", gate:"07", pnr:"X7K2QP", haul:"long", status:"boarding" },
+    { from:"DXB", fromCity:"Dubai", to:"LHR", toCity:"London", carrier:"Emirates", no:"EK 8",
+      date:"14 JAN 2026", dep:"08:30", arr:"13:05", aircraft:"A380", km:"5,497", co2:"1.8 t", seat:"32A", gate:"22", pnr:"M4D9RT", haul:"long", status:"landed" },
+    { from:"CDG", fromCity:"Paris CDG", to:"FCO", toCity:"Rome", carrier:"Air France", no:"AF 1281",
+      date:"18 MAY 2026", dep:"09:50", arr:"11:55", aircraft:"A320", km:"1,105", co2:"0.3 t", seat:"9F", gate:"14", pnr:"QP1L8N", haul:"short", status:"landed" },
+    { from:"SYD", fromCity:"Sydney", to:"LHR", toCity:"London", carrier:"Qantas", no:"QF 1",
+      date:"15 JUL 2026", dep:"21:40", arr:"05:30", aircraft:"A380", km:"16,983", co2:"5.4 t", seat:"2K", gate:"—", pnr:"H0NU5Z", haul:"long", status:"scheduled" },
+  ];
+
+  // a believable, varied barcode
+  function barcode() {
+    let bars = "";
+    const widths = [1,1,2,1,3,1,2,2,1,1,2,1,1,3,1,2,1,1,2,1,3,1,1,2,1,2,1,1,3,1,2,1,1,2,1,1,2,3,1,1];
+    widths.forEach(w => bars += `<i style="width:${w*1.4}px"></i>`);
+    return bars;
+  }
+
+  const passesEl = document.getElementById("passes");
+
+  function renderPasses() {
+    passesEl.innerHTML = FLIGHTS.map(f => `
+      <article class="pass" data-haul="${f.haul}" aria-label="${f.carrier} ${f.no} ${f.from} to ${f.to}">
+        <div class="pass__main">
+          <div class="route">
+            <div class="iata">${f.from}<small>${f.fromCity}</small></div>
+            <div class="leg">
+              <span class="plane">✈</span>
+              <span class="dashes"></span>
+              <span class="km">${f.km} km</span>
+            </div>
+            <div class="iata">${f.to}<small>${f.toCity}</small></div>
+          </div>
+          <div class="grid">
+            <div class="fld"><div class="k">Carrier</div><div class="v">${f.carrier}</div></div>
+            <div class="fld"><div class="k">Flight</div><div class="v big">${f.no}</div></div>
+            <div class="fld"><div class="k">Date</div><div class="v">${f.date}</div></div>
+            <div class="fld"><div class="k">Aircraft</div><div class="v">${f.aircraft}</div></div>
+            <div class="fld"><div class="k">Depart</div><div class="v big">${f.dep}</div></div>
+            <div class="fld"><div class="k">Arrive</div><div class="v big">${f.arr}</div></div>
+            <div class="fld"><div class="k">Seat</div><div class="v">${f.seat}</div></div>
+            <div class="fld"><div class="k">CO₂ est.</div><div class="v">${f.co2}</div></div>
+          </div>
+        </div>
+        <aside class="pass__stub">
+          <span class="status ${f.status}">${f.status}</span>
+          <div class="stub-row"><div class="k">Gate</div><div class="v">${f.gate}</div></div>
+          <div class="stub-row"><div class="k">Seat</div><div class="v">${f.seat}</div></div>
+          <div class="barcode" aria-hidden="true">${barcode()}</div>
+          <div class="pnr">${f.pnr}</div>
+        </aside>
+      </article>
+    `).join("");
+
+    // stagger each card's slide-up, then unfold its stub a beat later
+    [...passesEl.children].forEach((pass, i) => {
+      const base = i * 0.13;
+      pass.style.animationDelay = base.toFixed(2) + "s";
+      const stub = pass.querySelector(".pass__stub");
+      if (stub) stub.style.animationDelay = (base + 0.18).toFixed(2) + "s";
+    });
+  }
+
+  renderPasses();
+
+  document.querySelector(".switch").addEventListener("click", e => {
+    const btn = e.target.closest("button"); if (!btn) return;
+    document.documentElement.dataset.theme = btn.dataset.theme;
+    document.querySelectorAll(".switch button").forEach(b => b.setAttribute("aria-pressed", b===btn));
+    renderPasses(); // replay the entrance in the newly-picked theme
+  });
+
+  document.getElementById("replay").addEventListener("click", renderPasses);
+</script>
+</body>
+</html>

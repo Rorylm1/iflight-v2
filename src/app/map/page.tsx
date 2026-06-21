@@ -13,8 +13,8 @@ import type { User } from "@supabase/supabase-js";
 const FlightMap = dynamic(() => import("@/components/FlightMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[500px] rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-2 border-amber border-t-transparent"></div>
+    <div className="w-full h-[500px] rounded-xl bg-pass border border-line shadow-pass flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-2 border-teal border-t-transparent"></div>
     </div>
   ),
 });
@@ -72,7 +72,7 @@ export default function MapPage() {
         <Header user={user} />
         <main className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center py-24">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-amber border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-teal border-t-transparent"></div>
           </div>
         </main>
       </div>
@@ -84,13 +84,13 @@ export default function MapPage() {
       <div className="min-h-screen">
         <Header user={user} />
         <main className="max-w-6xl mx-auto px-4 py-8">
-          <div className="p-6 bg-red-900/50 border border-red-700 rounded-lg text-center">
-            <p className="text-red-200 mb-4">{error}</p>
+          <div className="p-6 bg-brick/10 border border-brick/40 rounded-xl text-center">
+            <p className="text-brick mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
+              className="px-4 py-2 bg-brick text-white rounded-md hover:opacity-90 transition-opacity"
             >
-              Try Again
+              Try again
             </button>
           </div>
         </main>
@@ -104,11 +104,13 @@ export default function MapPage() {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold mb-2">Flight Map & Carbon Impact</h1>
-          <p className="text-gray-400">
-            Visualize your routes and understand your environmental footprint
+        <div className="mb-8 pb-5 border-b-2 border-ink/80">
+          <p className="font-ticket text-[11px] uppercase tracking-[0.22em] text-ink-soft mb-2">
+            Routes &amp; carbon impact
           </p>
+          <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none text-ink">
+            Where you&apos;ve flown
+          </h1>
         </div>
 
         {/* Flight Map */}
@@ -123,12 +125,12 @@ export default function MapPage() {
         <div className="mt-8 text-center">
           <a
             href="/dashboard"
-            className="text-gray-400 hover:text-amber transition-colors inline-flex items-center gap-2"
+            className="text-ink-soft hover:text-teal transition-colors inline-flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Dashboard
+            Back to passes
           </a>
         </div>
       </main>

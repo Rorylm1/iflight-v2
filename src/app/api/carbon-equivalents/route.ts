@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 interface CarbonEquivalent {
-  emoji: string;
   value: string;
   label: string;
   description: string;
@@ -119,9 +118,9 @@ Example categories to draw from (pick different ones each time):
 - Pairs of jeans (33 kg CO2 per pair)
 - Emails sent (0.004 kg CO2 per email with attachment)
 
-Return ONLY a valid JSON array with exactly 4 objects, no markdown, no explanation:
+Return ONLY a valid JSON array with exactly 4 objects, no markdown, no explanation, no emoji:
 [
-  {"emoji": "☕", "value": "1,234", "label": "cups of coffee", "description": "Based on ~0.21kg CO2 per cup"},
+  {"value": "1,234", "label": "cups of coffee", "description": "Based on ~0.21kg CO2 per cup"},
   ...
 ]`;
 
@@ -189,25 +188,21 @@ Return ONLY a valid JSON array with exactly 4 objects, no markdown, no explanati
 function getStaticEquivalents(co2Kg: number): CarbonEquivalent[] {
   return [
     {
-      emoji: "🚗",
       value: Math.round(co2Kg / 0.21).toLocaleString(),
       label: "miles driven",
       description: "In an average petrol car",
     },
     {
-      emoji: "☕",
       value: Math.round(co2Kg / 0.21).toLocaleString(),
       label: "cups of coffee",
       description: "Including production & transport",
     },
     {
-      emoji: "📺",
       value: Math.round(co2Kg / 0.036).toLocaleString(),
       label: "hours of streaming",
       description: "Netflix, YouTube, etc.",
     },
     {
-      emoji: "🍔",
       value: Math.round(co2Kg / 3.5).toLocaleString(),
       label: "cheeseburgers",
       description: "Including beef production",

@@ -77,8 +77,8 @@ export default function GuestButton({ variant = "ghost" }: GuestButtonProps) {
     "transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
   const variantClasses =
     variant === "solid"
-      ? "px-8 py-3 bg-amber text-black font-semibold rounded hover:bg-amber-400"
-      : "text-sm text-gray-400 hover:text-amber underline-offset-4 hover:underline";
+      ? "px-8 py-3 bg-teal text-pass font-semibold rounded-md hover:bg-teal-soft"
+      : "text-sm text-ink-soft hover:text-teal underline-offset-4 hover:underline";
 
   return (
     <div className={variant === "solid" ? "" : "text-center"}>

@@ -63,15 +63,15 @@ export default function AddFlightModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-ink/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-md shadow-amber-glow">
+      <div className="bg-pass border border-line rounded-xl p-6 w-full max-w-md shadow-pass">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Add Flight</h2>
+          <h2 className="font-display font-extrabold text-2xl text-ink">Add flight</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-ink-soft hover:text-ink transition-colors"
             aria-label="Close modal"
           >
             <svg
@@ -95,7 +95,7 @@ export default function AddFlightModal({
           <div>
             <label
               htmlFor="flightNumber"
-              className="block text-sm font-medium text-gray-300 mb-2"
+              className="block font-ticket text-[11px] uppercase tracking-[0.16em] text-ink-soft mb-2"
             >
               Flight Number
             </label>
@@ -105,14 +105,14 @@ export default function AddFlightModal({
               value={flightNumber}
               onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
               placeholder="e.g., BA123"
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded text-white font-mono text-lg placeholder-gray-500 focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber caret-amber"
+              className="w-full px-4 py-3 bg-stub border border-line rounded-md text-ink font-ticket text-lg placeholder-ink-faint focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal caret-teal"
               required
               pattern="[A-Za-z0-9]{2,3}[0-9]{1,4}"
               title="Flight number format: 2-3 character airline code + 1-4 digits (e.g., BA123, EZY456, U2986)"
               disabled={isLoading}
               autoComplete="off"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-ink-faint">
               e.g., BA123, EZY456, U2986
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function AddFlightModal({
           <div>
             <label
               htmlFor="date"
-              className="block text-sm font-medium text-gray-300 mb-2"
+              className="block font-ticket text-[11px] uppercase tracking-[0.16em] text-ink-soft mb-2"
             >
               Flight Date
             </label>
@@ -130,7 +130,7 @@ export default function AddFlightModal({
               id="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded text-white font-mono text-lg focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber [color-scheme:dark]"
+              className="w-full px-4 py-3 bg-stub border border-line rounded-md text-ink font-ticket text-lg focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal [color-scheme:light]"
               required
               disabled={isLoading}
             />
@@ -138,7 +138,7 @@ export default function AddFlightModal({
 
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-red-900/50 border border-red-700 rounded text-red-200 text-sm">
+            <div className="p-3 bg-brick/10 border border-brick/40 rounded-md text-brick text-sm">
               {error}
             </div>
           )}
@@ -147,7 +147,7 @@ export default function AddFlightModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-amber text-black font-semibold rounded hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 bg-teal text-pass font-semibold rounded-md hover:bg-teal-soft transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en" data-theme="atlas">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>iFlight · The Travel Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DIRECTION D — "The Travel Log"
+     Subject: a printed travel journal / passport. Premium editorial
+     layout. Signature: rubber-stamp country marks (rotated, inked)
+     over a masthead-led magazine grid. Type pairs Fraunces (a serif
+     with optical character — deliberately NOT Playfair) for display,
+     Newsreader for literary body, and JetBrains Mono (a nod back to
+     the live app) for coordinates and flight data.
+     ============================================================ */
+
+  :root[data-theme="atlas"] {
+    --paper:   #f1ece1;
+    --paper-2: #e8e1d2;
+    --ink:     #211d18;
+    --ink-soft:#6c6453;
+    --rule:    #d6cdba;
+    --accent:  #1f4d46;   /* deep passport green — not terracotta */
+    --accent-2:#9c3b2e;   /* sealing-wax red for stamps */
+    --stamp:   #1f4d46;
+  }
+  :root[data-theme="passport"] {
+    --paper:   #f3ead7;   /* inner passport page */
+    --paper-2: #ecdfc4;
+    --ink:     #2a2113;
+    --ink-soft:#7a6a4c;
+    --rule:    #d8c8a4;
+    --accent:  #4a1722;   /* passport-cover burgundy */
+    --accent-2:#1f3a6d;   /* visa-ink blue */
+    --stamp:   #4a1722;
+    --foil:    #b08a3e;
+  }
+  :root[data-theme="nocturne"] {
+    --paper:   #16140f;
+    --paper-2: #1d1a14;
+    --ink:     #f0e9da;
+    --ink-soft:#9b9079;
+    --rule:    #2e2a20;
+    --accent:  #c9a24b;   /* brass foil */
+    --accent-2:#8fb6a6;
+    --stamp:   #c9a24b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: 'Newsreader', serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.4s ease, color 0.4s ease;
+    padding-bottom: 100px;
+  }
+  .sheet { max-width: 940px; margin: 0 auto; padding: clamp(28px, 6vw, 72px) clamp(20px,5vw,56px) 0; }
+
+  /* ---- masthead -------------------------------------------------- */
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 16px; }
+  .masthead__top { display:flex; justify-content:space-between; align-items:baseline; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ink-soft); }
+  .masthead h1 {
+    font-family:'Fraunces', serif; font-weight:600; font-size: clamp(46px, 11vw, 116px);
+    line-height:0.86; letter-spacing:-0.02em; margin: 14px 0 8px; text-align:center;
+  }
+  .masthead h1 em { font-style: italic; font-weight:500; color: var(--accent); }
+  .masthead__rule { display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft); padding-top:10px; border-top:1px solid var(--rule); margin-top:8px; }
+
+  /* ---- featured flight (the hero / thesis) ---------------------- */
+  .lede { display:grid; grid-template-columns: 1.5fr 1fr; gap: clamp(24px,5vw,52px); padding: 40px 0; border-bottom:1px solid var(--rule); align-items:center; }
+  .lede__eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.24em; text-transform:uppercase; color:var(--accent); margin-bottom: 18px; }
+  .lede h2 { font-family:'Fraunces',serif; font-weight:600; font-size: clamp(30px,5.4vw,56px); line-height:1.02; letter-spacing:-0.01em; margin:0 0 18px; }
+  .lede h2 .arrow { color: var(--accent); font-style: italic; padding: 0 0.12em; }
+  .lede p { font-size: clamp(16px,2.2vw,19px); line-height:1.5; color: var(--ink); max-width: 46ch; margin: 0 0 20px; }
+  .lede p .dropcap { float:left; font-family:'Fraunces',serif; font-weight:600; font-size: 3.2em; line-height:0.72; padding: 6px 10px 0 0; color: var(--accent); }
+  .lede__data { display:flex; gap: 28px; font-family:'JetBrains Mono',monospace; }
+  .lede__data .k { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft); }
+  .lede__data .v { font-size: 19px; margin-top:4px; }
+
+  /* the passport stamp — signature element */
+  .stampwell { position: relative; display:flex; align-items:center; justify-content:center; min-height: 240px; }
+  .stamp {
+    font-family:'JetBrains Mono',monospace; color: var(--stamp);
+    border: 2.5px solid var(--stamp); border-radius: 50%;
+    width: 190px; height:190px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:4px; opacity:0.82; mix-blend-mode: multiply;
+    box-shadow: inset 0 0 0 4px transparent, inset 0 0 0 6px var(--stamp);
+    transform: rotate(-9deg);
+  }
+  :root[data-theme="nocturne"] .stamp { mix-blend-mode: screen; }
+  .stamp .city { font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:26px; line-height:1; letter-spacing:0; }
+  .stamp .sub  { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; }
+  .stamp .date { font-size:12px; letter-spacing:0.16em; margin-top:2px; }
+  .stamp.s2 { position:absolute; right: 4px; bottom: 8px; width:120px; height:120px; transform: rotate(11deg); border-color: var(--accent-2); color: var(--accent-2); box-shadow: inset 0 0 0 6px var(--accent-2); opacity:0.62; }
+  .stamp.s2 .city { font-size:17px; }
+
+  /* ---- the log (list of journeys) ------------------------------- */
+  .loghead { display:flex; align-items:baseline; gap:14px; padding: 34px 0 14px; }
+  .loghead h3 { font-family:'Fraunces',serif; font-weight:600; font-size: 22px; margin:0; }
+  .loghead span { flex:1; height:1px; background: var(--rule); }
+  .loghead em { font-family:'JetBrains Mono',monospace; font-style:normal; font-size:11px; letter-spacing:0.16em; color:var(--ink-soft); text-transform:uppercase; }
+
+  .entry {
+    display:grid; grid-template-columns: 58px 1fr auto; gap: clamp(14px,3vw,30px);
+    align-items: baseline; padding: 20px 0; border-bottom:1px solid var(--rule);
+  }
+  .entry__folio { font-family:'Fraunces',serif; font-weight:600; font-size: 30px; color: var(--ink-soft); line-height:1; }
+  .entry__route { }
+  .entry__route .city { font-family:'Fraunces',serif; font-size: clamp(20px,3vw,26px); line-height:1.1; }
+  .entry__route .city .arr { color: var(--accent); font-style: italic; padding:0 0.18em; }
+  .entry__route .meta { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; color:var(--ink-soft); margin-top:6px; }
+  .entry__right { text-align:right; font-family:'JetBrains Mono',monospace; }
+  .entry__right .km { font-size: 17px; }
+  .entry__right .tag { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft); margin-top:4px; }
+  .entry__right .tag.now { color: var(--accent-2); }
+
+  .footnote { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-soft); text-align:center; padding: 34px 0; }
+
+  /* ---- switch + tag --------------------------------------------- */
+  .switch {
+    position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+    display:flex; gap:6px; padding:7px; border-radius:999px; z-index:50;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    border:1px solid var(--rule); backdrop-filter: blur(8px);
+    box-shadow: 0 8px 30px -10px rgba(0,0,0,0.3);
+  }
+  .switch button { border:0; cursor:pointer; padding:8px 15px; border-radius:999px; background:transparent; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; transition:all .18s ease; }
+  .switch button[aria-pressed="true"] { background: var(--accent); color: var(--paper); }
+  .switch button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .tag { position:fixed; top:14px; left:16px; z-index:50; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft); }
+  .tag b { color: var(--accent); }
+
+  /* entrance */
+  .lede, .entry { opacity:0; transform: translateY(12px); animation: rise .55s cubic-bezier(0.2,0.7,0.3,1) forwards; }
+  .entry:nth-child(2){animation-delay:.05s}.entry:nth-child(3){animation-delay:.1s}.entry:nth-child(4){animation-delay:.15s}.entry:nth-child(5){animation-delay:.2s}.entry:nth-child(6){animation-delay:.25s}
+  @keyframes rise { to { opacity:1; transform:none; } }
+
+  @media (max-width: 700px) {
+    .lede { grid-template-columns: 1fr; }
+    .stampwell { min-height: 200px; }
+    .entry { grid-template-columns: 38px 1fr; }
+    .entry__right { grid-column: 2; text-align:left; margin-top:6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lede, .entry { animation:none; opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="tag">iFlight · direction <b>D — travel log</b></div>
+
+  <div class="sheet">
+    <header class="masthead">
+      <div class="masthead__top"><span>iFlight Journal</span><span>Established MMXXVI</span></div>
+      <h1>The&nbsp;<em>Travel</em>&nbsp;Log</h1>
+      <div class="masthead__rule">
+        <span>Vol. I — London Heathrow</span>
+        <span>Seven sectors · Nine countries</span>
+        <span>49,100 km</span>
+      </div>
+    </header>
+
+    <section class="lede" aria-label="Featured flight">
+      <div>
+        <div class="lede__eyebrow">Next departure · today</div>
+        <h2>London <span class="arrow">to</span> New York</h2>
+        <p><span class="dropcap">B</span>A 117 lifts off Heathrow at half past two, a seven-hour arc over the North Atlantic aboard a Boeing 777. The longest single leg of the season so far — and the first of three transatlantic crossings logged this year.</p>
+        <div class="lede__data">
+          <div><div class="k">Distance</div><div class="v">5,541 km</div></div>
+          <div><div class="k">Aircraft</div><div class="v">B777</div></div>
+          <div><div class="k">CO₂ est.</div><div class="v">1.9 t</div></div>
+        </div>
+      </div>
+      <div class="stampwell" aria-hidden="true">
+        <div class="stamp">
+          <span class="sub">Arrival</span>
+          <span class="city">New York</span>
+          <span class="date">21 · VI · 26</span>
+          <span class="sub">JFK · USA</span>
+        </div>
+        <div class="stamp s2">
+          <span class="sub">Dep</span>
+          <span class="city">LHR</span>
+          <span class="date">14:30</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="loghead">
+      <h3>The Log</h3><span></span><em>2026 to date</em>
+    </div>
+    <div id="log"></div>
+
+    <div class="footnote">— end of volume · compiled from 7 boarding passes —</div>
+  </div>
+
+  <nav class="switch" aria-label="Theme">
+    <button data-theme="atlas"    aria-pressed="true">Atlas paper</button>
+    <button data-theme="passport" aria-pressed="false">Passport</button>
+    <button data-theme="nocturne" aria-pressed="false">Nocturne</button>
+  </nav>
+
+<script>
+  const LOG = [
+    { from:"London", to:"Frankfurt",     code:"LH 901 · A320 · 01 JUN", km:"654 km",   tag:"Landed" },
+    { from:"London", to:"Los Angeles",   code:"VS 25 · A350 · 03 APR",  km:"8,780 km", tag:"Landed" },
+    { from:"Paris",  to:"Rome",          code:"AF 1281 · A320 · 18 MAY",km:"1,105 km", tag:"Landed" },
+    { from:"London", to:"Singapore",     code:"SQ 317 · A380 · 02 MAR", km:"10,885 km",tag:"Landed" },
+    { from:"San Francisco", to:"London", code:"UA 930 · B787 · 09 FEB", km:"8,638 km", tag:"Landed" },
+    { from:"Dubai",  to:"London",        code:"EK 8 · A380 · 14 JAN",   km:"5,497 km", tag:"Landed" },
+  ];
+
+  document.getElementById("log").innerHTML = LOG.map((e, i) => `
+    <article class="entry">
+      <div class="entry__folio">${String(i+1).padStart(2,"0")}</div>
+      <div class="entry__route">
+        <div class="city">${e.from}<span class="arr">→</span>${e.to}</div>
+        <div class="meta">${e.code}</div>
+      </div>
+      <div class="entry__right">
+        <div class="km">${e.km}</div>
+        <div class="tag${e.tag==='Boarding'?' now':''}">${e.tag}</div>
+      </div>
+    </article>
+  `).join("");
+
+  document.querySelector(".switch").addEventListener("click", e => {
+    const btn = e.target.closest("button"); if (!btn) return;
+    document.documentElement.dataset.theme = btn.dataset.theme;
+    document.querySelectorAll(".switch button").forEach(b => b.setAttribute("aria-pressed", b===btn));
+  });
+</script>
+</body>
+</html>

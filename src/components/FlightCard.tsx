@@ -30,40 +30,41 @@ export interface Flight {
 interface FlightCardProps {
   flight: Flight;
   onDelete: (id: string) => void;
+  /** Position in its list — drives the staggered fold-in entrance. */
+  index?: number;
 }
 
-// Status styles - more subtle, integrated design
-const STATUS_STYLES: Record<string, { dot: string; text: string }> = {
-  scheduled: { dot: "bg-blue-400", text: "text-blue-400" },
-  active: { dot: "bg-green-400", text: "text-green-400" },
-  landed: { dot: "bg-gray-400", text: "text-gray-400" },
-  cancelled: { dot: "bg-red-400", text: "text-red-400" },
-  delayed: { dot: "bg-amber", text: "text-amber" },
-};
+/**
+ * Map a flight status to one of three boarding-pass stub treatments.
+ * The accent carries meaning: teal = live/your-action, brick = alert.
+ */
+function statusVariant(status: string): { cls: string; label: string } {
+  switch (status) {
+    case "cancelled":
+      return { cls: "bp-status--alert", label: "Cancelled" };
+    case "landed":
+      return { cls: "bp-status--done", label: "Landed" };
+    case "active":
+      return { cls: "bp-status--live", label: "In the air" };
+    case "delayed":
+      return { cls: "bp-status--alert", label: "Delayed" };
+    default:
+      return { cls: "bp-status--live", label: "Scheduled" };
+  }
+}
 
 /**
- * Get effective status based on date
- * If flight date is in the past and status is "scheduled", show as "landed"
+ * Past "scheduled" flights read as "landed" — the date is the source of truth.
  */
 function getEffectiveStatus(status: string, date: string): string {
-  // If explicitly cancelled, keep it
   if (status === "cancelled") return status;
-
-  // Check if flight date is in the past
-  const flightDate = new Date(date + "T23:59:59"); // End of flight day
-  const now = new Date();
-
-  if (flightDate < now) {
-    // Flight is in the past - show as landed unless cancelled
-    return "landed";
-  }
-
+  const flightDate = new Date(date + "T23:59:59");
+  if (flightDate < new Date()) return "landed";
   return status;
 }
 
 function formatTime(isoString: string): string {
-  const date = new Date(isoString);
-  return date.toLocaleTimeString("en-US", {
+  return new Date(isoString).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -71,8 +72,7 @@ function formatTime(isoString: string): string {
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString + "T00:00:00");
-  return date.toLocaleDateString("en-US", {
+  return new Date(dateString + "T00:00:00").toLocaleDateString("en-US", {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -84,7 +84,7 @@ function formatDistance(km: number | null): string {
   return km.toLocaleString() + " km";
 }
 
-// Convert country code to flag emoji (GB -> 🇬🇧)
+// Country code → flag emoji (GB → 🇬🇧)
 function countryToFlag(countryCode: string | null): string {
   if (!countryCode) return "";
   const codePoints = countryCode
@@ -94,7 +94,21 @@ function countryToFlag(countryCode: string | null): string {
   return String.fromCodePoint(...codePoints);
 }
 
-export default function FlightCard({ flight, onDelete }: FlightCardProps) {
+// Deterministic barcode (no Math.random — keeps SSR/CSR markup identical).
+function barcodeWidths(seed: string): number[] {
+  const widths: number[] = [];
+  for (let i = 0; i < 42; i++) {
+    const c = seed.charCodeAt(i % seed.length) + i * 7;
+    widths.push((c % 3) + 1);
+  }
+  return widths;
+}
+
+export default function FlightCard({
+  flight,
+  onDelete,
+  index = 0,
+}: FlightCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -105,10 +119,7 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
       const response = await fetch(`/api/flights?id=${flight.id}`, {
         method: "DELETE",
       });
-
-      if (response.ok) {
-        onDelete(flight.id);
-      }
+      if (response.ok) onDelete(flight.id);
     } catch (error) {
       console.error("Error deleting flight:", error);
     } finally {
@@ -117,191 +128,195 @@ export default function FlightCard({ flight, onDelete }: FlightCardProps) {
     }
   };
 
-  // Compute effective status (past flights show as "landed")
   const effectiveStatus = getEffectiveStatus(flight.status, flight.date);
-  const statusStyle = STATUS_STYLES[effectiveStatus] || STATUS_STYLES.scheduled;
+  const status = statusVariant(effectiveStatus);
+  const co2 = flight.distance_km ? calculateFlightCO2(flight.distance_km) : null;
+  const haul = co2?.haul === "long" ? "long" : "short";
+  const locator = flight.id.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase();
+
+  // Staggered entrance: card slides up, then the stub unfolds a beat later.
+  const base = Math.min(index * 0.07, 0.9);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gray-700 transition-colors">
-      {/* Main card content - clickable to expand */}
+    <article
+      className="bp-pass"
+      data-haul={haul}
+      style={{ animationDelay: `${base}s` }}
+      aria-label={`${flight.airline} ${flight.flight_number}, ${flight.departure_airport} to ${flight.arrival_airport}`}
+    >
+      {/* Main section — click to reveal the fine print */}
       <button
+        className="bp-main"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full text-left p-5 focus:outline-none focus:ring-2 focus:ring-amber/50 focus:ring-inset"
+        aria-expanded={isExpanded}
       >
-        {/* Top row: Flight number, airline, status */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xl text-amber font-bold tracking-wide">
-              {flight.flight_number}
-            </span>
-            <span className="text-gray-500">•</span>
-            <span className="text-gray-400">{flight.airline}</span>
-            {flight.source.includes("estimated") && (
-              <span className="text-xs px-2 py-0.5 bg-gray-800 border border-gray-700 rounded text-gray-500">
-                estimated
-              </span>
-            )}
+        <div className="bp-route">
+          <div className="bp-iata">
+            {flight.departure_airport}
+            <small>{flight.departure_airport_name || "Departure"}</small>
           </div>
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
-            <span className={`text-sm capitalize ${statusStyle.text}`}>
-              {effectiveStatus}
-            </span>
+          <div className="bp-leg" aria-hidden="true">
+            <span className="bp-plane">✈</span>
+            <span className="bp-dashes" />
+            <span className="bp-km">{formatDistance(flight.distance_km)}</span>
+          </div>
+          <div className="bp-iata" style={{ textAlign: "right" }}>
+            {flight.arrival_airport}
+            <small style={{ marginLeft: "auto" }}>
+              {flight.arrival_airport_name || "Arrival"}
+            </small>
           </div>
         </div>
 
-        {/* Route display - cleaner layout */}
-        <div className="flex items-center">
-          {/* Departure */}
-          <div className="flex-1">
-            <div className="font-mono text-3xl font-bold tracking-tight">
-              {flight.departure_airport}
-            </div>
-            <div className="text-gray-400 mt-1">
-              {formatTime(flight.departure_time)}
+        <div className="bp-grid">
+          <div className="bp-fld">
+            <div className="bp-k">Carrier</div>
+            <div className="bp-v">{flight.airline}</div>
+          </div>
+          <div className="bp-fld">
+            <div className="bp-k">Date</div>
+            <div className="bp-v">{formatDate(flight.date)}</div>
+          </div>
+          <div className="bp-fld">
+            <div className="bp-k">Depart</div>
+            <div className="bp-v bp-big">{formatTime(flight.departure_time)}</div>
+          </div>
+          <div className="bp-fld">
+            <div className="bp-k">Arrive</div>
+            <div className="bp-v bp-big">{formatTime(flight.arrival_time)}</div>
+          </div>
+          <div className="bp-fld">
+            <div className="bp-k">Aircraft</div>
+            <div className="bp-v">{flight.aircraft || "—"}</div>
+          </div>
+          <div className="bp-fld">
+            <div className="bp-k">Terminal</div>
+            <div className="bp-v">
+              {flight.departure_terminal ? `T${flight.departure_terminal}` : "—"}
             </div>
           </div>
-
-          {/* Center: Arrow, date, distance */}
-          <div className="flex-1 flex flex-col items-center px-4">
-            <div className="text-gray-400 text-sm mb-2">
-              {formatDate(flight.date)}
-            </div>
-            <div className="flex items-center w-full max-w-[120px]">
-              <div className="flex-1 h-px bg-gray-700"></div>
-              <svg
-                className="w-5 h-5 text-amber mx-2 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-              </svg>
-              <div className="flex-1 h-px bg-gray-700"></div>
-            </div>
-            <div className="text-gray-500 text-sm mt-2">
-              {formatDistance(flight.distance_km)}
-            </div>
+          <div className="bp-fld">
+            <div className="bp-k">CO₂ est.</div>
+            <div className="bp-v">{co2 ? formatCO2(co2.co2Kg) : "—"}</div>
           </div>
-
-          {/* Arrival */}
-          <div className="flex-1 text-right">
-            <div className="font-mono text-3xl font-bold tracking-tight">
-              {flight.arrival_airport}
-            </div>
-            <div className="text-gray-400 mt-1">
-              {formatTime(flight.arrival_time)}
+          <div className="bp-fld">
+            <div className="bp-k">Details</div>
+            <div className="bp-v" style={{ color: "var(--teal)" }}>
+              {isExpanded ? "Hide ▲" : "Show ▼"}
             </div>
           </div>
         </div>
       </button>
 
-      {/* Expanded details */}
-      {isExpanded && (
-        <div className="border-t border-gray-800 p-5 bg-gray-950/50">
-          {/* Airport details */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <div>
-              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                From
-              </div>
-              <div className="text-sm">
-                <span className="mr-2">{countryToFlag(flight.departure_country)}</span>
-                {flight.departure_airport_name || flight.departure_airport}
-              </div>
-              {flight.departure_time_actual && (
-                (effectiveStatus === "landed" || effectiveStatus === "active" || flight.departure_time_actual !== flight.departure_time) && (
-                  <div className="text-amber text-xs mt-1">
-                    {effectiveStatus === "landed" || effectiveStatus === "active" ? "Departed" : "Revised"}: {formatTime(flight.departure_time_actual)}
-                  </div>
-                )
-              )}
-            </div>
-            <div>
-              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                To
-              </div>
-              <div className="text-sm">
-                <span className="mr-2">{countryToFlag(flight.arrival_country)}</span>
-                {flight.arrival_airport_name || flight.arrival_airport}
-              </div>
-              {flight.arrival_time_actual && (
-                (effectiveStatus === "landed" || flight.arrival_time_actual !== flight.arrival_time) && (
-                  <div className="text-green-400 text-xs mt-1">
-                    {effectiveStatus === "landed" ? "Landed" : "Expected"}: {formatTime(flight.arrival_time_actual)}
-                  </div>
-                )
-              )}
-            </div>
+      {/* Perforated stub */}
+      <aside className="bp-stub" style={{ animationDelay: `${base + 0.18}s` }}>
+        <span className={`bp-status ${status.cls}`}>{status.label}</span>
+        <div className="bp-stubrow">
+          <div className="bp-k">Flight</div>
+          <div className="bp-v">{flight.flight_number}</div>
+        </div>
+        {flight.source.includes("estimated") && (
+          <div className="bp-k" style={{ letterSpacing: "0.1em" }}>
+            ~ estimated times
           </div>
+        )}
+        <div className="bp-barcode" aria-hidden="true">
+          {barcodeWidths(flight.id).map((w, i) => (
+            <i key={i} style={{ width: `${w * 1.4}px` }} />
+          ))}
+        </div>
+        <div className="bp-pnr">{locator}</div>
+      </aside>
 
-          {/* Flight details */}
+      {/* Expanded fine print */}
+      {isExpanded && (
+        <div className="bp-fine">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
-              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Departure Terminal
+              <div className="bp-k">From</div>
+              <div className="text-sm text-ink mt-1">
+                <span className="mr-2">
+                  {countryToFlag(flight.departure_country)}
+                </span>
+                {flight.departure_airport_name || flight.departure_airport}
               </div>
-              <div className="font-mono text-lg">
-                {flight.departure_terminal ? `T${flight.departure_terminal}` : "—"}
-              </div>
+              {flight.departure_time_actual &&
+                (effectiveStatus === "landed" ||
+                  effectiveStatus === "active" ||
+                  flight.departure_time_actual !== flight.departure_time) && (
+                  <div className="text-teal text-xs mt-1 font-ticket">
+                    {effectiveStatus === "landed" || effectiveStatus === "active"
+                      ? "Departed"
+                      : "Revised"}
+                    : {formatTime(flight.departure_time_actual)}
+                  </div>
+                )}
             </div>
             <div>
-              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Arrival Terminal
+              <div className="bp-k">To</div>
+              <div className="text-sm text-ink mt-1">
+                <span className="mr-2">
+                  {countryToFlag(flight.arrival_country)}
+                </span>
+                {flight.arrival_airport_name || flight.arrival_airport}
               </div>
-              <div className="font-mono text-lg">
+              {flight.arrival_time_actual &&
+                (effectiveStatus === "landed" ||
+                  flight.arrival_time_actual !== flight.arrival_time) && (
+                  <div className="text-teal text-xs mt-1 font-ticket">
+                    {effectiveStatus === "landed" ? "Landed" : "Expected"}:{" "}
+                    {formatTime(flight.arrival_time_actual)}
+                  </div>
+                )}
+            </div>
+            <div>
+              <div className="bp-k">Arrival terminal</div>
+              <div className="text-sm text-ink mt-1 font-ticket">
                 {flight.arrival_terminal ? `T${flight.arrival_terminal}` : "—"}
               </div>
             </div>
             <div>
-              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                Aircraft
-              </div>
-              <div className="font-mono text-sm">{flight.aircraft || "—"}</div>
-            </div>
-            <div>
-              <div className="text-gray-500 text-xs uppercase tracking-wide mb-1">
-                CO₂ Emissions
-              </div>
-              <div className="font-mono text-sm text-amber">
-                {flight.distance_km
-                  ? formatCO2(calculateFlightCO2(flight.distance_km).co2Kg)
-                  : "—"}
+              <div className="bp-k">Distance</div>
+              <div className="text-sm text-ink mt-1 font-ticket">
+                {formatDistance(flight.distance_km)}
               </div>
             </div>
           </div>
 
-          {/* Delete section */}
-          <div className="mt-6 pt-4 border-t border-gray-800">
+          {/* Delete */}
+          <div className="mt-6 pt-4 border-t border-line">
             {showDeleteConfirm ? (
               <div className="flex items-center justify-between">
-                <span className="text-gray-400">Delete this flight?</span>
+                <span className="text-ink-soft text-sm">
+                  Remove this pass from your log?
+                </span>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                    className="px-4 py-2 text-sm text-ink-soft hover:text-ink transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition-colors disabled:opacity-50"
+                    className="px-4 py-2 text-sm bg-brick text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
-                    {isDeleting ? "Deleting..." : "Delete"}
+                    {isDeleting ? "Removing…" : "Remove"}
                   </button>
                 </div>
               </div>
             ) : (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-gray-500 hover:text-red-400 transition-colors text-sm"
+                className="text-sm text-ink-soft hover:text-brick transition-colors"
               >
-                Delete flight
+                Remove flight
               </button>
             )}
           </div>
         </div>
       )}
-    </div>
+    </article>
   );
 }

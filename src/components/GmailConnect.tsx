@@ -65,7 +65,7 @@ export default function GmailConnect({ onSyncComplete }: GmailConnectProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-gray-500">
+      <div className="flex items-center gap-2 text-ink-soft">
         <svg
           className="w-4 h-4 animate-spin"
           fill="none"
@@ -97,24 +97,24 @@ export default function GmailConnect({ onSyncComplete }: GmailConnectProps) {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span className="text-sm text-gray-400">Gmail connected</span>
+              <div className="w-2 h-2 rounded-full bg-teal"></div>
+              <span className="text-sm text-ink-soft">Gmail connected</span>
             </div>
-            <div className="text-sm font-mono text-white mt-1">{status.email}</div>
+            <div className="text-sm font-ticket text-ink mt-1">{status.email}</div>
           </div>
 
           {showConfirm ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-3 py-1 text-sm text-gray-400 hover:text-white transition-colors"
+                className="px-3 py-1 text-sm text-ink-soft hover:text-ink transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDisconnect}
                 disabled={disconnecting}
-                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500 transition-colors disabled:opacity-50"
+                className="px-3 py-1 text-sm bg-brick text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {disconnecting ? "..." : "Disconnect"}
               </button>
@@ -122,7 +122,7 @@ export default function GmailConnect({ onSyncComplete }: GmailConnectProps) {
           ) : (
             <button
               onClick={() => setShowConfirm(true)}
-              className="text-sm text-gray-500 hover:text-red-400 transition-colors"
+              className="text-sm text-ink-soft hover:text-brick transition-colors"
             >
               Disconnect
             </button>
@@ -138,10 +138,10 @@ export default function GmailConnect({ onSyncComplete }: GmailConnectProps) {
   return (
     <button
       onClick={handleConnect}
-      className="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:border-amber hover:bg-gray-800/80 transition-colors"
+      className="flex items-center gap-2 px-4 py-2 bg-stub border border-line rounded-lg text-ink hover:border-teal hover:bg-pass transition-colors"
     >
       <svg
-        className="w-5 h-5"
+        className="w-5 h-5 text-teal"
         viewBox="0 0 24 24"
         fill="currentColor"
       >

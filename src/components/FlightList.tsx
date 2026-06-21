@@ -76,14 +76,14 @@ export default function FlightList() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-amber border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-teal border-t-transparent"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-900/50 border border-red-700 rounded text-red-200">
+      <div className="p-4 bg-brick/10 border border-brick/40 rounded-md text-brick">
         {error}
       </div>
     );
@@ -91,15 +91,19 @@ export default function FlightList() {
 
   return (
     <>
-      {/* Add Flight Button */}
-      <div className="mb-8 flex justify-between items-center">
+      {/* Masthead + Add Flight */}
+      <div className="mb-8 flex justify-between items-end gap-4 pb-5 border-b-2 border-ink/80">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Your Flights</h1>
-          <p className="text-gray-400">Track and manage your flight history</p>
+          <p className="font-ticket text-[11px] uppercase tracking-[0.22em] text-ink-soft mb-2">
+            Your travel log · {flights.length} sector{flights.length === 1 ? "" : "s"}
+          </p>
+          <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none">
+            Boarding passes
+          </h1>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-6 py-3 bg-amber text-black font-semibold rounded hover:bg-amber-400 transition-colors flex items-center gap-2"
+          className="shrink-0 px-5 py-3 bg-teal text-pass font-semibold rounded-md hover:bg-teal-soft transition-colors flex items-center gap-2"
         >
           <svg
             className="w-5 h-5"
@@ -114,43 +118,42 @@ export default function FlightList() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          Add Flight
+          Add flight
         </button>
       </div>
 
       {/* Flight Sections */}
       {flights.length === 0 ? (
-        <div className="border border-gray-800 border-dashed rounded-lg p-12 text-center">
-          <div className="text-4xl mb-4">✈️</div>
-          <h2 className="text-xl font-semibold mb-2">No flights yet</h2>
-          <p className="text-gray-400 mb-6">
-            Add your first flight to start tracking your journey
+        <div className="border-2 border-line border-dashed rounded-xl p-12 text-center bg-pass/60">
+          <div className="font-display font-extrabold text-3xl text-ink mb-2">
+            No passes yet
+          </div>
+          <p className="text-ink-soft mb-6">
+            Add your first flight to start your boarding-pass log.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 bg-amber text-black font-semibold rounded hover:bg-amber-400 transition-colors"
+            className="px-6 py-3 bg-teal text-pass font-semibold rounded-md hover:bg-teal-soft transition-colors"
           >
-            Add Your First Flight
+            Add your first flight
           </button>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div id="passes-perspective" className="space-y-10">
           {/* Upcoming Flights */}
           {upcomingFlights.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                Upcoming Flights
-                <span className="text-gray-500 font-normal">
-                  ({upcomingFlights.length})
-                </span>
+              <h2 className="font-ticket text-[11px] uppercase tracking-[0.2em] text-ink-soft mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal"></span>
+                Upcoming · {upcomingFlights.length}
               </h2>
-              <div className="space-y-3">
-                {upcomingFlights.map((flight) => (
+              <div className="space-y-6">
+                {upcomingFlights.map((flight, i) => (
                   <FlightCard
                     key={flight.id}
                     flight={flight}
                     onDelete={handleFlightDeleted}
+                    index={i}
                   />
                 ))}
               </div>
@@ -160,19 +163,17 @@ export default function FlightList() {
           {/* Past Flights */}
           {pastFlights.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-gray-500"></span>
-                Past Flights
-                <span className="text-gray-500 font-normal">
-                  ({pastFlights.length})
-                </span>
+              <h2 className="font-ticket text-[11px] uppercase tracking-[0.2em] text-ink-soft mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-ink-faint"></span>
+                Flown · {pastFlights.length}
               </h2>
-              <div className="space-y-3">
-                {pastFlights.map((flight) => (
+              <div className="space-y-6">
+                {pastFlights.map((flight, i) => (
                   <FlightCard
                     key={flight.id}
                     flight={flight}
                     onDelete={handleFlightDeleted}
+                    index={upcomingFlights.length + i}
                   />
                 ))}
               </div>
@@ -181,34 +182,23 @@ export default function FlightList() {
         </div>
       )}
 
-      {/* Stats */}
-      <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="bg-gray-900 border border-gray-800 rounded p-4">
-          <div className="text-2xl font-mono text-amber">{flights.length}</div>
-          <div className="text-sm text-gray-400">Total Flights</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded p-4">
-          <div className="text-2xl font-mono text-amber">
-            {totalDistance.toLocaleString()} km
+      {/* Frequent-flyer summary band */}
+      <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 rounded-xl border border-line bg-pass overflow-hidden divide-x divide-y divide-line md:divide-y-0">
+        {[
+          { v: flights.length.toString(), k: "Flights" },
+          { v: `${totalDistance.toLocaleString()} km`, k: "Distance" },
+          { v: uniqueAirports.toString(), k: "Airports" },
+          { v: uniqueAirlines.toString(), k: "Airlines" },
+          { v: formatCO2(totalCO2), k: "CO₂ est." },
+          { v: treesNeeded.toString(), k: "Trees to offset" },
+        ].map((s) => (
+          <div key={s.k} className="p-4">
+            <div className="font-ticket text-xl text-ink leading-tight">{s.v}</div>
+            <div className="font-ticket text-[10px] uppercase tracking-[0.14em] text-ink-soft mt-1">
+              {s.k}
+            </div>
           </div>
-          <div className="text-sm text-gray-400">Distance Flown</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded p-4">
-          <div className="text-2xl font-mono text-amber">{uniqueAirports}</div>
-          <div className="text-sm text-gray-400">Airports</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded p-4">
-          <div className="text-2xl font-mono text-amber">{uniqueAirlines}</div>
-          <div className="text-sm text-gray-400">Airlines</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded p-4">
-          <div className="text-2xl font-mono text-amber">{formatCO2(totalCO2)}</div>
-          <div className="text-sm text-gray-400">CO₂ Emissions</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded p-4">
-          <div className="text-2xl font-mono text-green-400">🌳 {treesNeeded}</div>
-          <div className="text-sm text-gray-400">Trees to Offset</div>
-        </div>
+        ))}
       </div>
 
       {/* Stats Panel */}
@@ -219,10 +209,12 @@ export default function FlightList() {
       )}
 
       {/* Gmail Sync */}
-      <div className="mt-12 bg-gray-900 border border-gray-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Import from Gmail</h2>
-        <p className="text-gray-400 text-sm mb-4">
-          Connect your Gmail to automatically find and import flight bookings from your inbox.
+      <div className="mt-12 bg-pass border border-line rounded-xl p-6">
+        <h2 className="font-display font-extrabold text-xl mb-2 text-ink">
+          Import from Gmail
+        </h2>
+        <p className="text-ink-soft text-sm mb-4">
+          Connect your inbox to automatically find and import flight bookings.
         </p>
         <GmailConnect onSyncComplete={fetchFlights} />
       </div>

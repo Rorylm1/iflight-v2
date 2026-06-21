@@ -281,9 +281,10 @@ export default function FlightMap({ flights }: FlightMapProps) {
           "line-cap": "round",
         },
         paint: {
-          "line-color": "#FFB000",
+          // luminous teal — the brand accent, brightened to read on the dark globe
+          "line-color": "#2BB7A8",
           "line-width": 2,
-          "line-opacity": 0.7,
+          "line-opacity": 0.75,
         },
       });
     }
@@ -305,10 +306,10 @@ export default function FlightMap({ flights }: FlightMapProps) {
         source: "airports",
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["get", "count"], 1, 5, 10, 12],
-          "circle-color": "#FFB000",
+          "circle-color": "#2BB7A8",
           "circle-stroke-color": "#0D0D0D",
           "circle-stroke-width": 2,
-          "circle-opacity": 0.9,
+          "circle-opacity": 0.95,
         },
       });
 
@@ -355,9 +356,9 @@ export default function FlightMap({ flights }: FlightMapProps) {
         popup
           .setLngLat(coordinates)
           .setHTML(
-            `<div class="font-mono text-amber font-bold">${iata}</div>
-             <div class="text-gray-300">${city}</div>
-             <div class="text-gray-500 text-sm">${count} flight${count !== 1 ? "s" : ""}</div>`
+            `<div style="color:#2BB7A8;font-weight:700;letter-spacing:0.04em" class="font-mono">${iata}</div>
+             <div class="text-gray-200">${city}</div>
+             <div class="text-gray-400 text-sm">${count} flight${count !== 1 ? "s" : ""}</div>`
           )
           .addTo(map.current);
       });
@@ -391,11 +392,10 @@ export default function FlightMap({ flights }: FlightMapProps) {
   // Show error if token is missing
   if (!token) {
     return (
-      <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-800 bg-gray-900 flex items-center justify-center">
-        <div className="text-center p-6">
-          <div className="text-4xl mb-4">🗺️</div>
-          <p className="text-red-400 font-semibold mb-2">Mapbox token not configured</p>
-          <p className="text-gray-500 text-sm">
+      <div className="relative w-full h-[500px] rounded-xl overflow-hidden border border-line bg-pass shadow-pass flex items-center justify-center">
+        <div className="text-center p-6 max-w-xs">
+          <p className="text-brick font-semibold mb-2">Mapbox token not configured</p>
+          <p className="text-ink-soft text-sm font-ticket">
             Add NEXT_PUBLIC_MAPBOX_TOKEN to environment variables
           </p>
         </div>
@@ -404,31 +404,37 @@ export default function FlightMap({ flights }: FlightMapProps) {
   }
 
   return (
-    <div className="relative w-full h-[500px] rounded-lg overflow-hidden border border-gray-800">
+    <div className="relative w-full h-[500px] rounded-xl overflow-hidden border border-line shadow-pass">
       <div
         ref={mapContainer}
         className="absolute inset-0 w-full h-full"
-        style={{ minHeight: '500px' }}
+        style={{ minHeight: "500px" }}
       />
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-amber border-t-transparent"></div>
+        <div className="absolute inset-0 flex items-center justify-center bg-paper">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-teal border-t-transparent"></div>
         </div>
       )}
       {flights.length === 0 && isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80">
-          <div className="text-center">
-            <div className="text-4xl mb-2">✈️</div>
-            <p className="text-gray-400">Add flights to see your routes on the map</p>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-pass border border-line rounded-xl shadow-pass px-7 py-6 text-center">
+            <svg
+              className="w-8 h-8 mx-auto mb-3 text-teal"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+            </svg>
+            <p className="text-ink-soft text-sm">Add flights to see your routes on the map</p>
           </div>
         </div>
       )}
       {mapError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/90">
-          <div className="text-center p-6">
-            <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-red-400 font-semibold mb-2">Map Error</p>
-            <p className="text-gray-400 text-sm">{mapError}</p>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-pass border border-brick/40 rounded-xl shadow-pass px-7 py-6 text-center max-w-xs">
+            <p className="text-brick font-semibold mb-2">Map error</p>
+            <p className="text-ink-soft text-sm">{mapError}</p>
           </div>
         </div>
       )}
