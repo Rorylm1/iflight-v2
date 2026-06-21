@@ -94,7 +94,7 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
         <button
           onClick={() => handleSync(false)}
           disabled={syncing}
-          className="flex items-center gap-2 px-4 py-2 bg-amber text-black font-semibold rounded-l hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 bg-teal text-pass font-semibold rounded-l-md hover:bg-teal-soft transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {syncing ? (
             <>
@@ -143,7 +143,7 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
         <button
           onClick={() => setShowOptions(!showOptions)}
           disabled={syncing}
-          className="px-2 py-2 bg-amber text-black font-semibold rounded-r border-l border-amber-600 hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 py-2 bg-teal text-pass font-semibold rounded-r-md border-l border-teal-soft hover:bg-teal-soft transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -152,22 +152,22 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
 
         {/* Dropdown menu */}
         {showOptions && !syncing && (
-          <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded shadow-lg z-10 min-w-[200px]">
+          <div className="absolute top-full left-0 mt-1 bg-pass border border-line rounded-md shadow-pass z-10 min-w-[200px] overflow-hidden">
             <button
               onClick={() => handleSync(false)}
-              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors"
+              className="w-full text-left px-4 py-3 hover:bg-stub transition-colors"
             >
-              <div className="font-semibold text-white">Quick Sync</div>
-              <div className="text-xs text-gray-400">
+              <div className="font-semibold text-ink">Quick Sync</div>
+              <div className="text-xs text-ink-soft">
                 Searches subject lines only (fast)
               </div>
             </button>
             <button
               onClick={() => handleSync(true)}
-              className="w-full text-left px-4 py-3 hover:bg-gray-700 transition-colors border-t border-gray-700"
+              className="w-full text-left px-4 py-3 hover:bg-stub transition-colors border-t border-line"
             >
-              <div className="font-semibold text-white">Deep Sync</div>
-              <div className="text-xs text-gray-400">
+              <div className="font-semibold text-ink">Deep Sync</div>
+              <div className="text-xs text-ink-soft">
                 Searches all airline emails (thorough)
               </div>
             </button>
@@ -177,12 +177,12 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-900/50 border border-red-700 rounded text-red-200 text-sm">
+        <div className="p-4 bg-brick/10 border border-brick/40 rounded-md text-brick text-sm">
           <div className="flex justify-between items-start">
             <span>{error}</span>
             <button
               onClick={dismissResult}
-              className="text-red-400 hover:text-red-200"
+              className="text-brick hover:opacity-70"
             >
               &times;
             </button>
@@ -192,34 +192,34 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
 
       {/* Success Result */}
       {result && (
-        <div className="p-4 bg-gray-800 border border-gray-700 rounded text-sm space-y-3">
+        <div className="p-4 bg-stub border border-line rounded-md text-sm space-y-3">
           <div className="flex justify-between items-start">
-            <h4 className="font-semibold text-white">Sync Complete</h4>
+            <h4 className="font-semibold text-ink">Sync complete</h4>
             <button
               onClick={dismissResult}
-              className="text-gray-400 hover:text-white"
+              className="text-ink-soft hover:text-ink"
             >
               &times;
             </button>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-2 text-gray-400">
+          <div className="grid grid-cols-2 gap-2 text-ink-soft font-ticket">
             <div>Emails scanned:</div>
-            <div className="text-white">{result.stats.emailsFound}</div>
+            <div className="text-ink">{result.stats.emailsFound}</div>
 
             <div>Flights found:</div>
-            <div className="text-white">{result.stats.flightsFound}</div>
+            <div className="text-ink">{result.stats.flightsFound}</div>
 
             <div>New flights added:</div>
-            <div className="text-amber font-semibold">
+            <div className="text-teal font-semibold">
               {result.stats.flightsNew}
             </div>
 
             {result.stats.flightsDuplicate > 0 && (
               <>
                 <div>Already existed:</div>
-                <div className="text-gray-500">
+                <div className="text-ink-faint">
                   {result.stats.flightsDuplicate}
                 </div>
               </>
@@ -228,14 +228,14 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
 
           {/* New Flights List */}
           {result.newFlights.length > 0 && (
-            <div className="pt-2 border-t border-gray-700">
-              <div className="text-gray-400 text-xs uppercase mb-2">
+            <div className="pt-2 border-t border-line">
+              <div className="text-ink-soft text-xs uppercase tracking-wide mb-2">
                 Added flights:
               </div>
               <div className="space-y-1">
                 {result.newFlights.map((f, i) => (
-                  <div key={i} className="font-mono text-amber">
-                    {f.flightNumber} - {f.date}
+                  <div key={i} className="font-ticket text-teal">
+                    {f.flightNumber} — {f.date}
                   </div>
                 ))}
               </div>
@@ -244,11 +244,11 @@ export default function GmailSyncButton({ onSyncComplete }: GmailSyncButtonProps
 
           {/* Errors */}
           {result.errors.length > 0 && (
-            <div className="pt-2 border-t border-gray-700">
-              <div className="text-red-400 text-xs uppercase mb-2">
+            <div className="pt-2 border-t border-line">
+              <div className="text-brick text-xs uppercase tracking-wide mb-2">
                 Errors ({result.errors.length}):
               </div>
-              <div className="text-red-300 text-xs space-y-1">
+              <div className="text-brick/80 text-xs space-y-1">
                 {result.errors.slice(0, 3).map((e, i) => (
                   <div key={i}>{e}</div>
                 ))}

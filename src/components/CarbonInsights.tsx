@@ -9,7 +9,6 @@ interface CarbonInsightsProps {
 }
 
 interface CarbonEquivalent {
-  emoji: string;
   value: string;
   label: string;
   description: string;
@@ -99,9 +98,9 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
   }, [totalCO2]);
 
   const haulColors: Record<HaulType, string> = {
-    short: "from-blue-500 to-blue-600",
-    medium: "from-amber to-amber-600",
-    long: "from-red-500 to-red-600",
+    short: "bg-teal",
+    medium: "bg-[#B8791F]",
+    long: "bg-brick",
   };
 
   const haulLabels: Record<HaulType, string> = {
@@ -112,10 +111,11 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
 
   if (landedFlights.length === 0) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
-        <div className="text-5xl mb-4">🌍</div>
-        <h2 className="text-xl font-semibold mb-2">Carbon Impact</h2>
-        <p className="text-gray-400">
+      <div className="bg-pass border border-line rounded-xl p-8 text-center">
+        <h2 className="font-display font-extrabold text-2xl mb-2 text-ink">
+          Carbon impact
+        </h2>
+        <p className="text-ink-soft">
           Complete some flights to see your carbon footprint analysis and personalized insights.
         </p>
       </div>
@@ -125,73 +125,61 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
   return (
     <div className="space-y-6">
       {/* Main Stats Header */}
-      <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-lg p-6">
+      <div className="bg-pass border border-line rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <span className="text-2xl">🌍</span>
-            Carbon Impact
+          <h2 className="font-display font-extrabold text-2xl text-ink">
+            Carbon impact
           </h2>
           <button
             onClick={() => fetchEquivalents(true)}
             disabled={isRefreshing}
-            className="text-sm text-gray-400 hover:text-amber transition-colors flex items-center gap-1 disabled:opacity-50"
+            className="text-sm text-ink-soft hover:text-teal transition-colors flex items-center gap-1.5 disabled:opacity-50"
           >
-            {isRefreshing ? (
-              <span className="animate-spin">↻</span>
-            ) : (
-              <span>↻</span>
-            )}
+            <span className={isRefreshing ? "animate-spin" : ""}>↻</span>
             New insights
           </button>
         </div>
 
-        {/* Hero Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="text-center p-6 bg-gray-800/30 rounded-xl border border-gray-700/50">
-            <div className="text-5xl font-mono text-amber font-bold mb-2">
+        {/* Hero Stats — three ticket stubs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="text-center p-6 bg-stub rounded-lg border border-line">
+            <div className="text-4xl font-ticket text-teal font-medium mb-2">
               {formatCO2(totalCO2)}
             </div>
-            <div className="text-gray-400">Total CO₂ Emissions</div>
-            <div className="text-gray-500 text-sm mt-1">
+            <div className="text-ink text-sm font-medium">Total CO₂ emissions</div>
+            <div className="text-ink-soft text-xs mt-1">
               Including radiative forcing (×1.9)
             </div>
           </div>
 
-          <div className="text-center p-6 bg-gray-800/30 rounded-xl border border-gray-700/50">
-            <div className="text-5xl font-mono text-green-400 font-bold mb-2">
-              🌳 {treesNeeded.toLocaleString()}
+          <div className="text-center p-6 bg-stub rounded-lg border border-line">
+            <div className="text-4xl font-ticket text-ink font-medium mb-2">
+              {treesNeeded.toLocaleString()}
             </div>
-            <div className="text-gray-400">Trees Needed</div>
-            <div className="text-gray-500 text-sm mt-1">
-              To absorb in one year
-            </div>
+            <div className="text-ink text-sm font-medium">Trees to offset</div>
+            <div className="text-ink-soft text-xs mt-1">To absorb in one year</div>
           </div>
 
-          <div className="text-center p-6 bg-gray-800/30 rounded-xl border border-gray-700/50">
-            <div className="text-5xl font-mono text-blue-400 font-bold mb-2">
+          <div className="text-center p-6 bg-stub rounded-lg border border-line">
+            <div className="text-4xl font-ticket text-ink font-medium mb-2">
               £{offsetCost.toFixed(0)}
             </div>
-            <div className="text-gray-400">Offset Cost</div>
-            <div className="text-gray-500 text-sm mt-1">
-              Via certified programs
-            </div>
+            <div className="text-ink text-sm font-medium">Offset cost</div>
+            <div className="text-ink-soft text-xs mt-1">Via certified programs</div>
           </div>
         </div>
 
         {/* AI-Generated Equivalents */}
         <div className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
+          <h3 className="font-ticket text-[11px] uppercase tracking-[0.18em] text-ink-soft mb-4">
             That&apos;s equivalent to...
           </h3>
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="bg-gray-800/50 rounded-xl p-5 animate-pulse"
-                >
-                  <div className="h-10 bg-gray-700 rounded mb-3"></div>
-                  <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                <div key={i} className="bg-stub rounded-lg p-5 border border-line animate-pulse">
+                  <div className="h-8 bg-line rounded mb-3"></div>
+                  <div className="h-3 bg-line rounded w-3/4"></div>
                 </div>
               ))}
             </div>
@@ -200,14 +188,13 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
               {equivalents.map((eq, index) => (
                 <div
                   key={index}
-                  className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 hover:border-amber/30 transition-colors group"
+                  className="bg-stub rounded-lg p-5 border border-line hover:border-teal/40 transition-colors group"
                 >
-                  <div className="text-4xl mb-2">{eq.emoji}</div>
-                  <div className="text-2xl font-mono text-white font-bold">
+                  <div className="text-2xl font-ticket text-ink font-medium">
                     {eq.value}
                   </div>
-                  <div className="text-gray-300 text-sm">{eq.label}</div>
-                  <div className="text-gray-500 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="text-ink text-sm mt-1">{eq.label}</div>
+                  <div className="text-ink-soft text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {eq.description}
                   </div>
                 </div>
@@ -218,8 +205,8 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
 
         {/* Emissions by Haul Type */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">
-            Emissions by Flight Distance
+          <h3 className="font-ticket text-[11px] uppercase tracking-[0.18em] text-ink-soft mb-4">
+            Emissions by flight distance
           </h3>
           <div className="space-y-3">
             {(["short", "medium", "long"] as HaulType[]).map((haul) => {
@@ -228,14 +215,14 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
               return (
                 <div key={haul}>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-300">{haulLabels[haul]}</span>
-                    <span className="text-gray-400 font-mono">
+                    <span className="text-ink">{haulLabels[haul]}</span>
+                    <span className="text-ink-soft font-ticket text-xs">
                       {formatCO2(co2ByHaul[haul])} ({percentage.toFixed(0)}%)
                     </span>
                   </div>
-                  <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="h-3 bg-stub rounded-full overflow-hidden border border-line">
                     <div
-                      className={`h-full bg-gradient-to-r ${haulColors[haul]} rounded-full transition-all duration-700`}
+                      className={`h-full ${haulColors[haul]} rounded-full transition-all duration-700`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -247,51 +234,43 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
       </div>
 
       {/* Quick Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
-          <div className="text-3xl font-mono text-amber font-bold">
-            {landedFlights.length}
+      <div className="grid grid-cols-2 md:grid-cols-4 rounded-xl border border-line bg-pass overflow-hidden divide-x divide-y divide-line md:divide-y-0">
+        {[
+          { v: landedFlights.length.toString(), k: "Flights completed" },
+          { v: totalDistance.toLocaleString(), k: "Kilometers flown" },
+          { v: uniqueCountries.toString(), k: "Countries visited" },
+          {
+            v: formatCO2(landedFlights.length > 0 ? totalCO2 / landedFlights.length : 0),
+            k: "Avg per flight",
+          },
+        ].map((s) => (
+          <div key={s.k} className="p-4 text-center">
+            <div className="font-ticket text-2xl text-ink">{s.v}</div>
+            <div className="font-ticket text-[10px] uppercase tracking-[0.14em] text-ink-soft mt-1">
+              {s.k}
+            </div>
           </div>
-          <div className="text-gray-400 text-sm">Flights Completed</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
-          <div className="text-3xl font-mono text-amber font-bold">
-            {totalDistance.toLocaleString()}
-          </div>
-          <div className="text-gray-400 text-sm">Kilometers Flown</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
-          <div className="text-3xl font-mono text-amber font-bold">
-            {uniqueCountries}
-          </div>
-          <div className="text-gray-400 text-sm">Countries Visited</div>
-        </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-center">
-          <div className="text-3xl font-mono text-amber font-bold">
-            {formatCO2(landedFlights.length > 0 ? totalCO2 / landedFlights.length : 0)}
-          </div>
-          <div className="text-gray-400 text-sm">Avg per Flight</div>
-        </div>
+        ))}
       </div>
 
       {/* Offset CTA */}
-      <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-800/50 rounded-lg p-6">
+      <div className="bg-teal/10 border border-teal/30 rounded-xl p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h3 className="text-green-400 font-semibold text-lg mb-1">
-              Offset Your Impact
-            </h3>
-            <p className="text-gray-300 text-sm">
-              For approximately <span className="font-mono text-green-400">£{offsetCost.toFixed(2)}</span>,
-              you can offset your {formatCO2(totalCO2)} of emissions through verified carbon reduction projects.
+            <h3 className="text-teal font-semibold text-lg mb-1">Offset your impact</h3>
+            <p className="text-ink text-sm">
+              For approximately{" "}
+              <span className="font-ticket text-teal">£{offsetCost.toFixed(2)}</span>, you
+              can offset your {formatCO2(totalCO2)} of emissions through verified carbon
+              reduction projects.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 shrink-0">
             <a
               href="https://www.goldstandard.org/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-teal text-pass rounded-md hover:bg-teal-soft transition-colors text-sm font-medium"
             >
               Gold Standard
             </a>
@@ -299,7 +278,7 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
               href="https://www.atmosfair.de/en/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-stub border border-line text-ink rounded-md hover:border-teal transition-colors text-sm font-medium"
             >
               Atmosfair
             </a>
@@ -308,26 +287,25 @@ export default function CarbonInsights({ flights }: CarbonInsightsProps) {
       </div>
 
       {/* Tips */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-        <h3 className="text-gray-300 font-semibold mb-4 flex items-center gap-2">
-          <span className="text-xl">💡</span>
-          Tips to Reduce Your Impact
+      <div className="bg-pass border border-line rounded-xl p-6">
+        <h3 className="font-display font-extrabold text-lg mb-4 text-ink">
+          Tips to reduce your impact
         </h3>
-        <ul className="space-y-2 text-gray-400 text-sm">
+        <ul className="space-y-2 text-ink-soft text-sm">
           <li className="flex items-start gap-2">
-            <span className="text-amber">•</span>
+            <span className="text-teal">•</span>
             <span>Choose direct flights when possible — takeoff and landing use the most fuel</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber">•</span>
+            <span className="text-teal">•</span>
             <span>Consider trains for journeys under 500km — they emit ~90% less CO₂</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber">•</span>
+            <span className="text-teal">•</span>
             <span>Fly economy class — business class has 3× the carbon footprint per passenger</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber">•</span>
+            <span className="text-teal">•</span>
             <span>Pack light — every extra kg increases fuel consumption</span>
           </li>
         </ul>

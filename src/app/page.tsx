@@ -17,26 +17,29 @@ export default async function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="text-center max-w-md">
-        <h1 className="text-5xl font-bold mb-4">
-          <span className="text-amber">i</span>Flight
+      <div className="text-center max-w-md w-full">
+        <p className="font-ticket text-[11px] uppercase tracking-[0.24em] text-ink-soft mb-5">
+          Your travel log · est. MMXXVI
+        </p>
+        <h1 className="font-display font-extrabold text-6xl tracking-tight mb-4 text-ink">
+          <span className="text-teal">i</span>Flight
         </h1>
-        <p className="text-gray-400 text-lg mb-8">
-          Track your flights. Visualize your journey.
+        <p className="text-ink-soft text-lg mb-8">
+          Every flight you take, kept as a boarding pass.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/auth/signin"
-            className="px-8 py-3 bg-amber text-black font-semibold rounded hover:bg-amber-400 transition-colors"
+            className="px-8 py-3 bg-teal text-pass font-semibold rounded-md hover:bg-teal-soft transition-colors"
           >
-            Sign In
+            Sign in
           </Link>
           <Link
             href="/auth/signup"
-            className="px-8 py-3 border border-gray-700 text-white font-semibold rounded hover:border-gray-600 transition-colors"
+            className="px-8 py-3 border border-line text-ink font-semibold rounded-md hover:border-ink-soft transition-colors"
           >
-            Create Account
+            Create account
           </Link>
         </div>
 
@@ -45,19 +48,11 @@ export default async function Home() {
           <GuestButton variant="ghost" />
         </div>
 
-        <div className="mt-16 grid grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="text-3xl mb-2">✈️</div>
-            <div className="text-sm text-gray-400">Log Flights</div>
-          </div>
-          <div>
-            <div className="text-3xl mb-2">📊</div>
-            <div className="text-sm text-gray-400">Track Stats</div>
-          </div>
-          <div>
-            <div className="text-3xl mb-2">🗺️</div>
-            <div className="text-sm text-gray-400">View Map</div>
-          </div>
+        {/* perforated feature strip */}
+        <div className="mt-16 grid grid-cols-3 border-t-2 border-dashed border-line pt-6 font-ticket text-[11px] uppercase tracking-[0.14em] text-ink-soft">
+          <div>Log flights</div>
+          <div className="border-x border-line">Carbon stats</div>
+          <div>Globe map</div>
         </div>
       </div>
     </main>

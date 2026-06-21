@@ -36,14 +36,17 @@ export default function SignInPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold mb-2 text-center">
-          <span className="text-amber">i</span>Flight
+        <h1 className="font-display font-extrabold text-4xl mb-2 text-center text-ink">
+          <span className="text-teal">i</span>Flight
         </h1>
-        <p className="text-gray-400 text-center mb-8">Sign in to your account</p>
+        <p className="text-ink-soft text-center mb-8">Sign in to your account</p>
 
         <form onSubmit={handleSignIn} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm text-gray-400 mb-1">
+            <label
+              htmlFor="email"
+              className="block font-ticket text-[11px] uppercase tracking-[0.16em] text-ink-soft mb-1.5"
+            >
               Email
             </label>
             <input
@@ -52,13 +55,16 @@ export default function SignInPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded text-white placeholder-gray-500 focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber"
+              className="w-full px-4 py-3 bg-pass border border-line rounded-md text-ink placeholder-ink-faint focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm text-gray-400 mb-1">
+            <label
+              htmlFor="password"
+              className="block font-ticket text-[11px] uppercase tracking-[0.16em] text-ink-soft mb-1.5"
+            >
               Password
             </label>
             <input
@@ -67,13 +73,13 @@ export default function SignInPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded text-white placeholder-gray-500 focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber"
+              className="w-full px-4 py-3 bg-pass border border-line rounded-md text-ink placeholder-ink-faint focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm bg-red-500/10 px-4 py-2 rounded">
+            <div className="text-brick text-sm bg-brick/10 border border-brick/30 px-4 py-2 rounded-md">
               {error}
             </div>
           )}
@@ -81,24 +87,24 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-amber text-black font-semibold rounded hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-teal text-pass font-semibold rounded-md hover:bg-teal-soft transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        <p className="text-gray-400 text-center mt-6">
+        <p className="text-ink-soft text-center mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="text-amber hover:underline">
+          <Link href="/auth/signup" className="text-teal hover:underline">
             Sign up
           </Link>
         </p>
 
         {/* Divider + no-signup path */}
         <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-px bg-gray-800"></div>
-          <span className="text-gray-600 text-xs uppercase tracking-wide">or</span>
-          <div className="flex-1 h-px bg-gray-800"></div>
+          <div className="flex-1 h-px bg-line"></div>
+          <span className="text-ink-faint font-ticket text-[10px] uppercase tracking-[0.18em]">or</span>
+          <div className="flex-1 h-px bg-line"></div>
         </div>
         <GuestButton variant="ghost" />
       </div>

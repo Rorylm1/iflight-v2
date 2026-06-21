@@ -23,16 +23,19 @@ export default function Header({ user }: HeaderProps) {
   };
 
   const navItems = [
-    { href: "/dashboard", label: "Flights", icon: "✈️" },
-    { href: "/map", label: "Map & Stats", icon: "🌍" },
+    { href: "/dashboard", label: "Passes" },
+    { href: "/map", label: "Map & Stats" },
   ];
 
   return (
-    <header className="border-b border-gray-800 bg-gray-950/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b-2 border-ink/80 bg-paper/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <a href="/dashboard" className="text-xl font-bold">
-            <span className="text-amber">i</span>Flight
+          <a
+            href="/dashboard"
+            className="font-display font-extrabold text-2xl tracking-tight text-ink"
+          >
+            <span className="text-teal">i</span>Flight
           </a>
 
           {user && (
@@ -41,13 +44,12 @@ export default function Header({ user }: HeaderProps) {
                 <a
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     pathname === item.href
-                      ? "bg-amber/10 text-amber"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800"
+                      ? "bg-teal/10 text-teal"
+                      : "text-ink-soft hover:text-ink hover:bg-ink/5"
                   }`}
                 >
-                  <span>{item.icon}</span>
                   {item.label}
                 </a>
               ))}
@@ -58,18 +60,18 @@ export default function Header({ user }: HeaderProps) {
         {user && (
           <div className="flex items-center gap-4">
             {user.is_anonymous ? (
-              <span className="text-xs px-2 py-1 rounded-full bg-amber/10 text-amber border border-amber/20">
+              <span className="text-[10px] uppercase tracking-[0.14em] font-ticket px-2.5 py-1 rounded-full bg-teal/10 text-teal border border-teal/25">
                 Guest mode
               </span>
             ) : (
-              <span className="text-gray-400 text-sm hidden md:block">
+              <span className="text-ink-soft text-sm hidden md:block font-ticket">
                 {user.email}
               </span>
             )}
             <button
               onClick={handleSignOut}
               disabled={loading}
-              className="text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+              className="text-sm text-ink-soft hover:text-brick transition-colors disabled:opacity-50"
             >
               {loading ? "..." : user.is_anonymous ? "Exit" : "Sign out"}
             </button>

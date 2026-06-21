@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>iFlight · Design Sandbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; background:#0c0d10; color:#eceae4;
+    font-family:'JetBrains Mono',monospace; padding: clamp(28px,6vw,72px);
+    -webkit-font-smoothing:antialiased;
+  }
+  .head { max-width:980px; margin:0 auto 40px; }
+  .head h1 { font-family:'Fraunces',serif; font-weight:600; font-size:clamp(30px,6vw,52px); margin:0 0 10px; letter-spacing:-0.02em; }
+  .head h1 b { color:#ffb000; font-weight:600; }
+  .head p { color:#8a8a92; font-size:13px; line-height:1.7; max-width:62ch; letter-spacing:0.02em; }
+  .grid { max-width:980px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+  a.card {
+    display:block; text-decoration:none; color:inherit; padding:26px;
+    border:1px solid #23242a; border-radius:12px; background:linear-gradient(180deg,#15161a,#101115);
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  a.card:hover { border-color:#ffb000; transform: translateY(-3px); }
+  a.card:focus-visible { outline:2px solid #ffb000; outline-offset:3px; }
+  .card .letter { font-family:'Fraunces',serif; font-size:34px; color:#ffb000; line-height:1; }
+  .card h2 { font-size:16px; margin:14px 0 8px; letter-spacing:0.02em; }
+  .card p { color:#8a8a92; font-size:12px; line-height:1.6; margin:0 0 14px; }
+  .card .themes { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#5a5a62; }
+  .note { max-width:980px; margin:34px auto 0; color:#5a5a62; font-size:11px; line-height:1.8; letter-spacing:0.04em; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1><b>iFlight</b> · design sandbox</h1>
+    <p>Three distinctive directions to replace the generic dark-dashboard look. Each renders the same realistic flight data and ships with a live theme switcher (bottom of screen). Open each, flip the themes, and note which direction + theme feels most like iFlight. We port the winning decisions — not the code — into the real app.</p>
+  </div>
+  <div class="grid">
+    <a class="card" href="./a-solari-board.html">
+      <div class="letter">A</div>
+      <h2>Solari Departures Board</h2>
+      <p>The split-flap board at the gate. Characters flip into place; status colours carry meaning.</p>
+      <div class="themes">Amber · Signage · Vintage</div>
+    </a>
+    <a class="card" href="./b-boarding-pass.html">
+      <div class="letter">B</div>
+      <h2>Boarding Pass</h2>
+      <p>Every flight a physical ticket — perforated stub, barcode, dot-matrix print.</p>
+      <div class="themes">Manila · Red-eye · Mid-century</div>
+    </a>
+    <a class="card" href="./d-travel-log.html">
+      <div class="letter">D</div>
+      <h2>The Travel Log</h2>
+      <p>A printed travel journal — serif masthead, passport stamps, editorial grid.</p>
+      <div class="themes">Atlas · Passport · Nocturne</div>
+    </a>
+  </div>
+  <p class="note">research/designs/ — throwaway sandbox · nothing here is wired into the live app yet</p>
+</body>
+</html>
