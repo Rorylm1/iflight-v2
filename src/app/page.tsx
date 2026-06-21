@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
+import GuestButton from "@/components/GuestButton";
 
 // Opt out of static generation - this page checks auth state
 export const dynamic = "force-dynamic";
@@ -37,6 +38,11 @@ export default async function Home() {
           >
             Create Account
           </Link>
+        </div>
+
+        {/* No-signup path for visitors / employers evaluating the app */}
+        <div className="mt-6">
+          <GuestButton variant="ghost" />
         </div>
 
         <div className="mt-16 grid grid-cols-3 gap-8 text-center">

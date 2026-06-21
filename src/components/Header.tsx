@@ -57,15 +57,21 @@ export default function Header({ user }: HeaderProps) {
 
         {user && (
           <div className="flex items-center gap-4">
-            <span className="text-gray-400 text-sm hidden md:block">
-              {user.email}
-            </span>
+            {user.is_anonymous ? (
+              <span className="text-xs px-2 py-1 rounded-full bg-amber/10 text-amber border border-amber/20">
+                Guest mode
+              </span>
+            ) : (
+              <span className="text-gray-400 text-sm hidden md:block">
+                {user.email}
+              </span>
+            )}
             <button
               onClick={handleSignOut}
               disabled={loading}
               className="text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
             >
-              {loading ? "..." : "Sign out"}
+              {loading ? "..." : user.is_anonymous ? "Exit" : "Sign out"}
             </button>
           </div>
         )}

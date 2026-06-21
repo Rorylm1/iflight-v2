@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import GuestButton from "@/components/GuestButton";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
@@ -92,6 +93,14 @@ export default function SignInPage() {
             Sign up
           </Link>
         </p>
+
+        {/* Divider + no-signup path */}
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-gray-800"></div>
+          <span className="text-gray-600 text-xs uppercase tracking-wide">or</span>
+          <div className="flex-1 h-px bg-gray-800"></div>
+        </div>
+        <GuestButton variant="ghost" />
       </div>
     </main>
   );
